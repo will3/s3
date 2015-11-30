@@ -6,7 +6,10 @@ class Injector
 
 	factory: (type, factory) ->
 		deps = []
-		if _.isArray factory
+
+		if factory.$inject?
+			deps = factory.$inject
+		else if _.isArray factory
 			last = factory.pop()
 			deps = factory
 			factory = last
@@ -23,7 +26,10 @@ class Injector
 
 	service: (type, constructor) ->
 		deps = []
-		if _.isArray constructor
+
+		if constructor.$inject?
+			deps = constructor.$inject
+		else if _.isArray constructor
 			last = constructor.pop()
 			deps = constructor
 			constructor = last

@@ -4,6 +4,7 @@ _ = require 'lodash'
 class World
 	constructor: () ->
 		@scene = {}
+
 	attach: (object, component) ->
 		if object._entityId is undefined
 			object._entityId = THREE.Math.generateUUID()
@@ -37,6 +38,23 @@ class World
 		if components.length is 0
 			delete @scene[object._entityId]
 		return
+
+	getComponents: (object) ->
+		return @scene[object._entityId]
+
+	getComponent: (object, type, option) ->
+		components = @getComponents object
+
+		if option == 'search up'
+			found = _.find components, (c) ->
+				c._type == type
+
+			return found if found?
+			return undefined if not object.parent?
+			return @getComponent object.parent, type, option
+
+		return _.find components, (c) ->
+			return c._type == type
 
 	traverse: (callback) ->
 		for id, components of @scene

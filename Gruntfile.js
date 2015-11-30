@@ -1,14 +1,19 @@
 module.exports = function(grunt) {
   grunt.initConfig({
 
-    browserify: {
-      dist: {
-        files: {
-          'dist/js/bundle.js': ['src/app.coffee']
-        },
-        options: {
-          transform: ['coffeeify']
+    watchify: {
+      options: {
+        extensions: ['.js', '.coffee'],
+        keepalive: true,
+        callback: function(b) {
+          b.transform("coffeeify");
+          return b;
         }
+      },
+
+      dist: {
+        src: './src/app.coffee',
+        dest: './src/bundle.js'
       }
     },
 
@@ -23,9 +28,27 @@ module.exports = function(grunt) {
           expand: true,
           flatten: true,
           src: [
-            'bower_components/three.js/three.min.js'
+            'bower_components/three.js/three.min.js',
+            'bower_components/lodash/lodash.min.js',
+            'bower_components/jquery/dist/jquery.min.js',
+            'bower_components/jquery/dist/jquery.min.map'
           ],
           dest: 'dist/js/vendor'
+        }, {
+          expand: true,
+          flatten: true,
+          src: ['src/bundle.js'],
+          dest: 'dist/js/'
+        }, {
+          expand: true,
+          flatten: true,
+          src: ['src/images/*'],
+          dest: 'dist/images'
+        }, {
+          expand: true,
+          flatten: true,
+          src: ['src/gui/gui.css'],
+          dest: 'dist/css'
         }]
       }
     },
@@ -43,8 +66,8 @@ module.exports = function(grunt) {
 
     watch: {
       main: {
-        files: ['src/**/*.{js,coffee}', 'Gruntfile.js'],
-        tasks: ['mochaTest', 'browserify', 'copy'],
+        files: ['src/index.html', 'src/bundle.js', 'src/images/*', 'src/gui/*.css', 'Gruntfile.js'],
+        tasks: ['mochaTest', 'copy'],
         options: {
           livereload: true
         }
@@ -64,6 +87,15 @@ module.exports = function(grunt) {
           'src/test/**/*.{js,coffee}'
         ]
       },
+    },
+
+    concurrent: {
+      dev: {
+        tasks: ['build', 'dist'],
+        options: {
+          logConcurrentOutput: true
+        }
+      }
     }
 
   });
@@ -74,6 +106,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-mocha-test');
+  grunt.loadNpmTasks('grunt-watchify');
+  grunt.loadNpmTasks('grunt-concurrent');
 
-  grunt.registerTask('default', ['mochaTest', 'clean', 'browserify', 'copy', 'connect', 'watch']);
+  grunt.registerTask('dist', ['clean', 'copy', 'connect', 'watch']);
+  grunt.registerTask('build', 'mochaTest', 'watchify');
+  grunt.registerTask('default', 'concurrent:dev');
 };

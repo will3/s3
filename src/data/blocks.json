@@ -1,0 +1,16 @@
+{
+	"default": {
+		"img": "/images/cube.png",
+		"qty": 100,
+		"color": "0xcccccc",
+		"selected": true
+	},
+	"engine": {
+		"img": "/images/cube.png",
+		"qty": 0
+	},	
+	"test": {
+		"img": "/images/cube.png",
+		"qty": 0
+	}
+}

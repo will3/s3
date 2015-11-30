@@ -5,13 +5,20 @@ class Input
 	constructor: (@element) ->
 		@state = new InputState
 		@listeners = {}
+		@lastMousedowns = {}
+		@clickTime = 150
 
 	start: () ->
 		@element.addEventListener 'mousedown', @listeners.mousedown = (e) => 
 			@state.mousedowns.push(e.button)
+			@lastMousedowns[e.button] = new Date().getTime()
 			return
 		@element.addEventListener 'mouseup', @listeners.mouseup = (e) => 
 			@state.mouseups.push(e.button)
+			lastMousedown = @lastMousedowns[e.button]
+			if lastMousedown?
+				diff = new Date().getTime() - lastMousedown
+				@state.mouseclicks.push e.button if diff < @clickTime
 			return
 		@element.addEventListener 'mousemove', @listeners.mousemove = (e) => 
 			@state.mouseX = e.clientX
@@ -19,15 +26,19 @@ class Input
 			return
 		@element.addEventListener 'mouseenter', @listeners.mouseenter = () => 
 			@state.mouseenter = true
+			@state.keyholds = []
 			return
 		@element.addEventListener 'mouseleave', @listeners.mouseleave = () => 
 			@state.mouseleave = true
+			@state.keyholds = []
 			return
 		@element.addEventListener 'keydown', @listeners.keydown = (e) =>
 			@state.keydowns.push keycode e
+			@state.keyholds.push keycode e
 			return
 		@element.addEventListener 'keyup', @listeners.keyup = (e) =>
 			@state.keyups.push keycode e
+			_.pull @state.keyholds, keycode e
 			return
 		return
 
@@ -55,6 +66,8 @@ class InputState
 		@mouseleave = false
 		@keydowns = []
 		@keyups = []
+		@keyholds = []
+		@mouseclicks = []
 
 	mouseDown: (button) ->
 		return @mousedowns.length > 0 if button is undefined
@@ -64,11 +77,18 @@ class InputState
 		return @mouseups.length > 0 if button is undefined
 		return _.includes @mouseups, button
 
+	mouseClick: (button) ->
+		return @mouseclicks.length > 0 if button is undefined
+		return _.includes @mouseclicks, button
+
 	keyDown: (key) ->
 		return _.includes @keydowns, key
 
 	keyUp: (key) ->
 		return _.includes @keyups, key
+
+	keyHold: (key) ->
+		return _.includes @keyholds, key
 
 	clearTemporalStates: () ->
 		@mousedowns = []
@@ -77,6 +97,7 @@ class InputState
 		@mouseleave = false
 		@keydowns = []
 		@keyups = []
+		@mouseclicks = []
 		return
 
 module.exports = () ->

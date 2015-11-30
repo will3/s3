@@ -1,13 +1,9 @@
 ndarray = require 'ndarray'
 
-class Block
-	constructor: () ->
-		@color = 0xff0000
-
 class FixedSizeChunk 
 	constructor: (@chunkSize = 16) ->
 		@origin = [0, 0, 0]
-		@map = ndarray [], [@size, @size, @size]
+		@map = ndarray [], [@chunkSize, @chunkSize, @chunkSize]
 		@dirty = false
 		@mesh = null
 
@@ -17,11 +13,20 @@ class FixedSizeChunk
 	set: (x, y, z, value) ->
 		@map.set x - @origin[0], y - @origin[1], z - @origin[2], value
 		@dirty = true
+		return
 
-	dispose: () ->
-		if @mesh isnt null
-			@mesh.geometry.dispose()
-			@mesh.material.dispose()
+	serialize: () ->
+		origin: @origin
+		chunkSize: @chunkSize
+		map: {
+			shape: @map.shape,
+			data: @map.data
+		}
+
+	deserialize: (json) ->
+		@origin = json.origin
+		@chunkSize = json.chunkSize
+		@map = ndarray(json.map.data, json.map.shape)
 
 class Chunk
 	constructor: (@chunkSize = 16) ->
@@ -38,11 +43,6 @@ class Chunk
 		chunk = @addChunk x, y, z if chunk is undefined
 		chunk.set x, y, z, value
 		return
-
-	dispose: () ->
-		for id, chunk of @chunks
-			chunk.dispose()
-		return	
 
 	getChunk: (x, y, z) ->
 		origin = @getOrigin x, y, z
@@ -66,5 +66,21 @@ class Chunk
 			Math.floor(y / @chunkSize) * @chunkSize,
 			Math.floor(z / @chunkSize) * @chunkSize
 		]
+
+	serialize: () ->
+		chunks = []
+		for id, chunk of @chunks
+			chunks.push chunk.serialize()
+
+		chunkSize: @chunkSize,
+		chunks: chunks
+
+	deserialize: (json) ->
+		@chunkSize = chunkSize
+		@chunks = {}
+		chunks = json.chunks
+		for c in chunks
+			chunk = new FixedSizeChunk()
+			chunk.deserialize(c)
 
 module.exports = Chunk

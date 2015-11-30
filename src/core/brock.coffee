@@ -9,9 +9,17 @@ class Brock
 		@systems = {}	
 		@start()
 
+	getComponents: (object) ->
+		return @world.getComponents object
+
+	getComponent: (object, type, option) ->
+		return @world.getComponent object, type, option
+
 	attach: (object, component) ->
 		if typeof component is 'string'
-			component = @_injector.get(component)
+			type = component
+			component = @_injector.get(type)
+			component._type = type
 		component.object = object
 		@world.attach object, component
 		return component
@@ -33,6 +41,9 @@ class Brock
 		@_injector.value type, system
 		return
 
+	get: (type) ->
+		return @_injector.get type
+
 	tick: () ->
 		for type, system of @systems
 			if !system._started
@@ -41,12 +52,16 @@ class Brock
 			system.tick() if system.tick isnt undefined
 
 		@world.traverse (c) =>
+			if c.$active == false
+				return
 			if !c._started
 				c.start() if c.start isnt undefined
 				c._started = true
 			c.tick() if c.tick isnt undefined
 
 		@world.traverse (c) =>
+			if c.$active == false
+				return
 			c.lateTick() if c.lateTick isnt undefined
 
 		for type, system of @systems

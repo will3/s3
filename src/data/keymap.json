@@ -1,0 +1,11 @@
+{
+  "mouseAdd": 0,
+  "mouseRemove": 2,
+  "mouseDrag": 2,
+  "zoomIn": "=",
+  "zoomOut": "-",
+  "left": "left",
+  "right": "right",
+  "up": "up",
+  "down": "down"
+}

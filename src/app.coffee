@@ -3,12 +3,16 @@ THREE = require 'three'
 scene = null
 camera = null
 renderer = null
+app = null
+
+document.oncontextmenu = (e) ->
+	e.preventDefault()
 
 initRenderer = () ->
 	renderer = new THREE.WebGLRenderer antialias: true
 	renderer.setSize window.innerWidth, window.innerHeight
 	document.body.appendChild renderer.domElement
-	renderer.setClearColor 0xffffff
+	renderer.setClearColor 0x111111
 
 	camera = new THREE.PerspectiveCamera(
 		75,
@@ -17,7 +21,6 @@ initRenderer = () ->
 		1000
 	);
 	camera.position.z = 50
-
 	scene = new THREE.Scene
 
 	window.addEventListener('resize', () ->
@@ -29,10 +32,10 @@ initRenderer = () ->
 	ambientLight = new THREE.AmbientLight 0xcccccc
 	scene.add ambientLight
 
-	directionalLight = new THREE.DirectionalLight 0xffffff, 0.3
+	directionalLight = new THREE.DirectionalLight 0xffffff, 0.4
 	directionalLight.position.set 0.5, 1.0, 0.3
 	scene.add directionalLight
-
+		
 	return
 
 animate = () ->
@@ -44,24 +47,29 @@ initApp = () ->
 	app = brock()
 
 	input = brock.input(window)
-	app.use('input', input)
-	app.component 'blockModel', require './components/blockmodel.coffee'
-	app.component 'cameraController', ['input', require './components/cameracontroller.coffee']
 
-	object = new THREE.Object3D
-	scene.add object
-	blockModel = app.attach object, 'blockModel'
-	blockModel.set 0, 0, 0, 0x333333
-	blockModel.set 1, 0, 0, 0x333333
-	blockModel.set 2, 0, 0, 0x333333
-	blockModel.set 3, 0, 0, 0x333333
-	blockModel.set 4, 0, 0, 0x333333
-	blockModel.set 5, 0, 0, 0x333333
-	blockModel.set 6, 0, 0, 0x333333
+	app.use 'input', input
+	app.value 'camera', camera
+	app.value 'window', window
+	app.value 'scene', scene
+	app.value 'app', app
 
+	require('./register.coffee')(app);
+	require('./setupgui.coffee')(app, scene);
+
+	return
+
+initScenario = () ->
 	app.attach camera, 'cameraController'
+
+	root = new THREE.Object3D
+	scene.add root
+	game = app.attach root, 'game'
+	app.value 'game', game
+
 	return
 
 initRenderer()
 animate()
 initApp()
+initScenario()

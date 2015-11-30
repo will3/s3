@@ -1,0 +1,40 @@
+.gui-unselectable { 
+  -moz-user-select: none; 
+  -khtml-user-select: none; 
+  -webkit-user-select: none; 
+  -o-user-select: none; 
+} 
+
+.panel {
+	position: absolute;
+	left: 20px;
+	top: 20px;
+	width: 100px;
+	background: rgba(33, 33, 33, 0.5);
+	border-radius: 5px;
+}
+
+.panel-row {
+	position: relative;
+}
+
+.panel-block > img {
+	width: 40px;
+	height: 40px;
+}
+
+.panel-block {
+	display: inline-block;
+}
+
+.panel-label {
+	color: #f6f6f6;
+	text-align: right;
+	display: inline-block;
+}
+
+.panel-highlight {
+	border-color: #fff;
+	border-width: 1px;
+	border-style: solid;
+}

@@ -35,18 +35,3 @@ describe 'Chunk', () ->
 		it 'returns false when there is no chunk', () ->
 			chunk = new Chunk(16)
 			expect(chunk.hasChunk(0, 0, 0)).to.be.false
-
-	describe 'dispose', () ->
-		it 'disposes all geometries and materials', () ->
-			chunk = new Chunk(16)
-			sub = chunk.addChunk(1, 2, 3)
-			geometry = sinon.mock(new THREE.Geometry())
-			material = sinon.mock(new THREE.MeshBasicMaterial())
-			geometry.expects('dispose')
-			material.expects('dispose')
-			sub.mesh = new THREE.Mesh(geometry.object, material.object)
-
-			chunk.dispose()
-
-			geometry.verify();
-			material.verify();

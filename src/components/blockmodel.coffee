@@ -6,22 +6,33 @@ Chunk = require '../voxel/chunk.coffee'
 class BlockModel
 	constructor: () ->
 		@chunk = new Chunk()
-		@gridSize = 2
+		@gridSize = 1
 		@obj = null
+		# @material = new THREE.MeshBasicMaterial
+		# 	vertexColors: true
+		@material = new THREE.MeshLambertMaterial
+			vertexColors: true
+		@origin = new THREE.Vector3()
 
 	start: () -> 
 		@obj = new THREE.Object3D
 		@object.add(@obj)
 		return
 
-	tick: () ->
+	tick: () -> 
 		for id, chunk of @chunk.chunks when chunk.dirty
 			@updateChunk chunk
 			chunk.dirty = false
 		return
 
+	set: (x, y, z, obj) ->
+		@chunk.set x, y, z, obj
+		return
+
 	dispose: () ->
-		@chunk.dispose()
+		@material.dispose()
+		for id, chunk of @chunks
+			chunk.geometry.dispose()
 		@object.remove @obj
 
 	updateChunk: (chunk) ->
@@ -37,27 +48,43 @@ class BlockModel
 		geometry = new THREE.Geometry
 		geometry.vertices = result.vertices.map (v) =>
 			new THREE.Vector3 v[0], v[1], v[2]
+				.add @origin
+				.sub new THREE.Vector3 0.5, 0.5, 0.5
 				.multiplyScalar @gridSize
 
 		geometry.faces = result.faces.map (f) =>
 			face = new THREE.Face3 f[0], f[1], f[2]
-			face.color = new THREE.Color @palette[f[3] - 1]
+			face.color = new THREE.Color f[3]
 			return face
 
 		geometry.computeFaceNormals()
 
-		material = new THREE.MeshLambertMaterial 
-			vertexColors: true
-
-		mesh = new THREE.Mesh geometry, material
+		mesh = new THREE.Mesh geometry, @material
 		chunk.mesh = mesh
 
-		origin = chunk.origin.clone()
-		  .multiplyScalar @gridSize
+		origin = new THREE.Vector3(
+			chunk.origin[0] * @gridSize
+			chunk.origin[1] * @gridSize
+			chunk.origin[2] * @gridSize
+			)
 		mesh.position.copy origin
 
 		@obj.add mesh
-
 		return
+
+	pointToCoord: (point) ->
+		coord = point.clone().multiplyScalar(1 / @gridSize)
+		.sub @origin
+
+		coord = new THREE.Vector3(
+			Math.round coord.x
+			Math.round coord.y
+			Math.round coord.z
+		)
+
+	coordToPoint: (coord) ->
+		new THREE.Vector3 coord.x, coord.y, coord.z
+				.add @origin
+				.multiplyScalar @gridSize 
 
 module.exports = BlockModel

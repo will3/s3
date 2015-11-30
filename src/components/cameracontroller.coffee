@@ -1,17 +1,19 @@
 THREE = require 'three'
 
 class CameraController
-	constructor: (@input) ->
+	constructor: (@input, @keyMap) ->
 		@lastX = 0
 		@lastY = 0
 		@rotateSpeed = 0.01
 		@target = new THREE.Vector3()
-		@rotation = new THREE.Euler()
+		@rotation = new THREE.Euler Math.PI / 4, Math.PI / 4, 0
 		@rotation.order = 'YXZ'
 		@distance = 50
 		@drag = false
 		@maxPitch = Math.PI / 2 - 0.01
 		@minPitch = -Math.PI / 2 + 0.01
+		@zoomRate = 1.1
+		@cameraSpeed = 1
 		return
 
 	start: () ->
@@ -21,18 +23,26 @@ class CameraController
 		return
 
 	tick: () ->
+		@updateMouse()
+		@updateZoom()
+		@updateKeys()
+		@updateCamera()
+
+		return
+
+	updateMouse: () ->
 		inputState = @input.state
 
-		if inputState.mouseDown 0
+		if inputState.mouseDown @keyMap.mouseDrag
 			@drag = true
 
-		if inputState.mouseUp 0 or inputState.mouseEnter or inputState.mouseLeave
+		if inputState.mouseUp @keyMap.mouseDrag or inputState.mouseEnter or inputState.mouseLeave
 			@drag = false
 
 		if @drag
 			diffX = inputState.mouseX - @lastX
 			diffY = inputState.mouseY - @lastY
-			@rotation.x += diffY * @rotateSpeed
+			@rotation.x -= diffY * @rotateSpeed
 			@rotation.y += diffX * @rotateSpeed
 			@rotation.x = @maxPitch if @rotation.x > @maxPitch
 			@rotation.x = @minPitch if @rotation.x < @minPitch
@@ -40,10 +50,39 @@ class CameraController
 		@lastX = inputState.mouseX
 		@lastY = inputState.mouseY
 
-		@updateCamera()
+	updateKeys: () ->
+		inputState = @input.state
 
+		rightAmount = 0
+		upAmount = 0
+		if inputState.keyHold @keyMap.right
+			rightAmount++
+		if inputState.keyHold @keyMap.left
+			rightAmount--
+		if inputState.keyHold @keyMap.up
+			upAmount++
+		if inputState.keyHold @keyMap.down
+			upAmount--
+
+		up = new THREE.Vector3(0, 0, 1).applyEuler @rotation
+		up.y = 0
+		up.normalize()
+
+		right = up.clone().applyEuler new THREE.Euler 0, -Math.PI / 2, 0
+
+		d = up.clone().multiplyScalar(@cameraSpeed * upAmount).add(
+			right.clone().multiplyScalar(@cameraSpeed * rightAmount))
+
+		@target.add d
 		return
 
+	updateZoom: () ->
+		inputState = @input.state
+		if inputState.keyDown @keyMap.zoomIn
+			@distance /= @zoomRate
+		if inputState.keyDown @keyMap.zoomOut
+			@distance *= @zoomRate
+			
 	updateCamera: () ->
 		unit = new THREE.Vector3 0, 0, 1 
 			.applyEuler @rotation
