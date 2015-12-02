@@ -10,11 +10,14 @@ class Input
 
 	start: () ->
 		@element.addEventListener 'mousedown', @listeners.mousedown = (e) => 
-			@state.mousedowns.push(e.button)
+			@state.mousedowns.push e.button
+			if not _.includes @state.mouseholds, e.button
+				@state.mouseholds.push e.button
 			@lastMousedowns[e.button] = new Date().getTime()
 			return
 		@element.addEventListener 'mouseup', @listeners.mouseup = (e) => 
-			@state.mouseups.push(e.button)
+			@state.mouseups.push e.button
+			_.pull @state.mouseholds, e.button
 			lastMousedown = @lastMousedowns[e.button]
 			if lastMousedown?
 				diff = new Date().getTime() - lastMousedown
@@ -27,14 +30,17 @@ class Input
 		@element.addEventListener 'mouseenter', @listeners.mouseenter = () => 
 			@state.mouseenter = true
 			@state.keyholds = []
+			@state.mouseholds = []
 			return
 		@element.addEventListener 'mouseleave', @listeners.mouseleave = () => 
 			@state.mouseleave = true
 			@state.keyholds = []
+			@state.mouseholds = []
 			return
 		@element.addEventListener 'keydown', @listeners.keydown = (e) =>
+			if not _.includes @state.keyholds, keycode e
+				@state.keyholds.push keycode e
 			@state.keydowns.push keycode e
-			@state.keyholds.push keycode e
 			return
 		@element.addEventListener 'keyup', @listeners.keyup = (e) =>
 			@state.keyups.push keycode e
@@ -62,6 +68,7 @@ class InputState
 		@mouseY = 0
 		@mousedowns = []
 		@mouseups = []
+		@mouseholds = []
 		@mouseenter = false
 		@mouseleave = false
 		@keydowns = []
@@ -76,6 +83,10 @@ class InputState
 	mouseUp: (button) ->
 		return @mouseups.length > 0 if button is undefined
 		return _.includes @mouseups, button
+
+	mouseHold: (button) ->
+		return @mouseholds.length > 0 if button is undefined
+		return _.includes @mouseholds, button
 
 	mouseClick: (button) ->
 		return @mouseclicks.length > 0 if button is undefined

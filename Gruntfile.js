@@ -49,6 +49,11 @@ module.exports = function(grunt) {
           flatten: true,
           src: ['src/gui/gui.css'],
           dest: 'dist/css'
+        }, {
+          expand: true,
+          cwd: 'src/threejs',
+          src: ['**/*.js'],
+          dest: 'dist/js/threejs'
         }]
       }
     },

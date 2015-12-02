@@ -1,6 +1,12 @@
 THREE = require 'three'
 
-module.exports = (objects, ground, input, camera) ->
+module.exports = (objects, groundY, input, camera) ->
+	geometry = new THREE.PlaneGeometry(999, 999)
+	geometry.vertices.forEach (v) ->
+		v.applyEuler new THREE.Euler -Math.PI / 2, 0, 0
+		v.y = groundY
+	ground = new THREE.Mesh geometry
+
 	inputState = input.state
 	mouse = new THREE.Vector2(
 		(inputState.mouseX / @window.innerWidth) * 2 - 1, 
@@ -13,5 +19,7 @@ module.exports = (objects, ground, input, camera) ->
 
 	if intersects.length == 0
 		intersects = raycaster.intersectObject ground
+
+	geometry.dispose()
 
 	return intersects[0]

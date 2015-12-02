@@ -1,5 +1,6 @@
 THREE = require 'three'
 getMouseOvers = require './utils/mouseovers.coffee'
+DragCommand = require './commands/dragcommand.coffee'
 
 class Editor
 	@$inject: ['input', 'camera', 'window', 'app', 'keyMap', 'blocks', 'events', 'game', 'scene']
@@ -11,7 +12,7 @@ class Editor
 		@selectedListener = (type) =>
 			@blockType = type
 		@objBlockModel = new THREE.Object3D()
-		@ground = null
+		@command = null
 
 	start: () ->
 		@object.add @objWireframe
@@ -22,11 +23,6 @@ class Editor
 
 		@events.on 'block type selected', @selectedListener
 
-		geometry = new THREE.PlaneGeometry(999, 999)
-		geometry.vertices.forEach (v) ->
-			v.applyEuler new THREE.Euler -Math.PI / 2, 0, 0
-		@ground = new THREE.Mesh geometry
-
 		return
 
 	tick: () ->
@@ -35,14 +31,14 @@ class Editor
 			@app.getComponent c, 'blockModel'
 		objs = _.map blockModels, 'obj'
 
-		intersect = getMouseOvers objs, @ground, @input, @camera
+		intersect = getMouseOvers objs, 0, @input, @camera
 
 		mouseCollision = null
 		blockModel = null
 
 		if intersect?
 			obj = intersect.object
-			blockModel = if obj is @ground then @blockModel else @app.getComponent obj, 'blockModel', 'search up'
+			blockModel = @app.getComponent(obj, 'blockModel', 'search up') || @blockModel
 
 			diff = intersect.point.clone().sub @camera.position
 			distance = intersect.distance
@@ -52,16 +48,15 @@ class Editor
 
 			mouseCollision = 
 				coordAbove: blockModel.pointToCoord pointAbove
-				coordBelow: blockModel.pointToCoord pointBelow		
+				coordBelow: blockModel.pointToCoord pointBelow
 
-		@updateWireframe(mouseCollision, blockModel)	
-		@updateClick(mouseCollision, blockModel)
+		# @updateWireframe(mouseCollision, blockModel)	
+		# @updateInput(mouseCollision, blockModel)
 
 		return
 
 	dispose: () ->
 		@events.removeListener 'block type selected', @selectedListener
-		@ground.geometry.dispose()
 
 		return
 
@@ -73,23 +68,19 @@ class Editor
 			@objWireframe.position.copy position
 		return
 
-	updateClick: (mouseCollision, blockModel) -> 
-		inputState = @input.state
-		if inputState.mouseClick(@keyMap.mouseAdd) and mouseCollision?
-			coordAbove = mouseCollision.coordAbove
-			block = @blocks[@blockType]
-			color = block.color
-			qty = block.qty
-			if qty <= 0
-				return
+	updateInput: (mouseCollision, blockModel) -> 
+		# inputState = @input.state
 
-			@add blockModel, coordAbove, color
-			block.qty--
-			@events.emit('block quantity changed');
+		# if inputState.mouseHold(@keyMap.mouseAdd) and mouseCollision?
+		# 	if @command == null
+		# 		color = 0xff0000
+		# 		@command = new DragCommand(mouseCollision.coordAbove, @blockModel, color)
+		# 	else
+		# 		@command.endCoord = mouseCollision.coordAbove
+		# 	@command.run()
 
-		if inputState.mouseClick(@keyMap.mouseRemove) and mouseCollision?
-			coordBelow = mouseCollision.coordBelow
-			@remove blockModel, coordBelow
+		# if inputState.mouseUp(@keyMap.mouseAdd)
+		# 	@command = null
 		
 		return
 

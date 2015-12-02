@@ -8,10 +8,10 @@ class BlockModel
 		@chunk = new Chunk()
 		@gridSize = 1
 		@obj = null
-		# @material = new THREE.MeshBasicMaterial
-		# 	vertexColors: true
-		@material = new THREE.MeshLambertMaterial
+		@material = new THREE.MeshBasicMaterial
 			vertexColors: true
+		# @material = new THREE.MeshLambertMaterial
+		# 	vertexColors: true
 		@origin = new THREE.Vector3()
 
 	start: () -> 
@@ -29,6 +29,9 @@ class BlockModel
 		@chunk.set x, y, z, obj
 		return
 
+	get: (x, y, z) ->
+		@chunk.get x, y, z
+		
 	dispose: () ->
 		@material.dispose()
 		for id, chunk of @chunks
