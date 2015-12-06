@@ -1,9 +1,8 @@
 module.exports = (app, scene) ->
-	app.attach scene, 'gui-panel'
-
-	# require('./gui/panel.coffee')(
-	# 	blocks: blocks
-	# 	events: events
-	# 	click: (type) ->
-	# 		console.log type
-	# )
+	game = app.get 'game'
+	panel = require './gui/gui-panel.coffee'
+	panel
+		blocks: app.get 'blocks'
+		click: (type) ->
+			game.blockType = type
+	return

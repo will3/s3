@@ -3,6 +3,7 @@ _ = require 'lodash'
 class Injector
 	constructor: () ->
 		@bindings = {}
+		@cache = {}
 
 	factory: (type, factory) ->
 		deps = []
@@ -24,7 +25,7 @@ class Injector
 			value: value
 		return
 
-	service: (type, constructor) ->
+	service: (type, constructor, cached = false) ->
 		deps = []
 
 		if constructor.$inject?
@@ -42,6 +43,8 @@ class Injector
 					[null].concat args
 				))
 			deps: deps
+			cached: cached
+
 		return
 
 	get: (type) ->
@@ -53,12 +56,20 @@ class Injector
 		if binding.value isnt undefined
 			return binding.value
 
+		if @cache[type]?
+			return @cache[type]
+
 		factory = binding.factory
 
 		deps = binding.deps.map (t) =>
 			@get(t)
 
-		return factory.apply(null, deps)
+		obj = factory.apply(null, deps)
+
+		if binding.cached
+			@cache[type] = obj
+
+		return obj
 
 module.exports = () ->
 	new Injector()

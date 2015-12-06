@@ -1,22 +1,6 @@
 module.exports = function(grunt) {
   grunt.initConfig({
 
-    watchify: {
-      options: {
-        extensions: ['.js', '.coffee'],
-        keepalive: true,
-        callback: function(b) {
-          b.transform("coffeeify");
-          return b;
-        }
-      },
-
-      dist: {
-        src: './src/app.coffee',
-        dest: './src/bundle.js'
-      }
-    },
-
     copy: {
       main: {
         files: [{
@@ -31,7 +15,8 @@ module.exports = function(grunt) {
             'bower_components/three.js/three.min.js',
             'bower_components/lodash/lodash.min.js',
             'bower_components/jquery/dist/jquery.min.js',
-            'bower_components/jquery/dist/jquery.min.map'
+            'bower_components/jquery/dist/jquery.min.map',
+            'node_modules/shader-particle-engine/build/SPE.min.js'
           ],
           dest: 'dist/js/vendor'
         }, {
@@ -92,29 +77,15 @@ module.exports = function(grunt) {
           'src/test/**/*.{js,coffee}'
         ]
       },
-    },
-
-    concurrent: {
-      dev: {
-        tasks: ['build', 'dist'],
-        options: {
-          logConcurrentOutput: true
-        }
-      }
     }
 
   });
 
-  grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-mocha-test');
-  grunt.loadNpmTasks('grunt-watchify');
-  grunt.loadNpmTasks('grunt-concurrent');
 
-  grunt.registerTask('dist', ['clean', 'copy', 'connect', 'watch']);
-  grunt.registerTask('build', 'mochaTest', 'watchify');
-  grunt.registerTask('default', 'concurrent:dev');
+  grunt.registerTask('default', ['clean', 'mochaTest', 'copy', 'connect', 'watch']);
 };

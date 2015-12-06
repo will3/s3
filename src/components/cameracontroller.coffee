@@ -55,13 +55,13 @@ class CameraController
 
 		rightAmount = 0
 		upAmount = 0
-		if inputState.keyHold @keyMap.right
+		if inputState.keyHold @keyMap['camera-right']
 			rightAmount++
-		if inputState.keyHold @keyMap.left
+		if inputState.keyHold @keyMap['camera-left']
 			rightAmount--
-		if inputState.keyHold @keyMap.up
+		if inputState.keyHold @keyMap['camera-up']
 			upAmount++
-		if inputState.keyHold @keyMap.down
+		if inputState.keyHold @keyMap['camera-down']
 			upAmount--
 
 		up = new THREE.Vector3(0, 0, 1).applyEuler @rotation

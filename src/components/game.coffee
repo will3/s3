@@ -1,43 +1,60 @@
 THREE = require 'three'
-class Game
-	@$inject: ["scene", "app", "input"]
+_ = require 'lodash'
 
-	constructor: (@scene, @app, @input) ->
+class Game
+	@$inject: ['scene', 'app', 'input', 'keyMap', 'mouseovers', 'events']
+
+	constructor: (@scene, @app, @input, @keyMap, @mouseovers, @events) ->
 		@editMode = false
-		@editor = null
-		@collidables = []
+		@blockType = 'default'	#selected block type
+		@attachListener = null
+		@dettachListener = null
+		@selectables = []
+		@selection = null
+		@shipControl = null
 
 	start: () ->
 		# add asteroid
 		object = new THREE.Object3D()
 		@scene.add object
-		@app.attach object, 'blockModel'
+		blockModel = @app.attach object, 'blockModel'
 		@app.attach object, 'asteroid'
-		@collidables.push object
 
-		@editor = @app.attach @object, 'editor'
-		@editor.$active = false
+		root = new THREE.Object3D()
+		@scene.add root
+		@app.attach root, 'editor'
+		@shipControl = @app.attach root, 'shipControl'
 
+		@events.on 'attach', @attachListener = (object, component) =>
+			if component._type == 'selectable'
+				@selectables.push component
+			return
+
+		@events.on 'dettach', @dettachListener = (object, component) =>
+			_.pull @selectables, component
+			return
+		
 		return
 
 	tick: () ->
 		@updateInput()
 		return
 
+	dispose: () ->
+		@events.removeListener 'attach', @attachListener
+		@events.removeListener 'dettach', @dettachListener
+
 	updateInput: () ->
 		inputState = @input.state
-		if inputState.keyDown 'b'
-			@editMode = !@editMode
-			if @editMode
-				@startEdit()
-			else
-				@endEdit()
-		return
 
-	startEdit: () ->
-		@editor.$active = true
+		if inputState.mouseDown @keyMap.mouseSelect
+			objects = _.map @selectables, 'object'
+			intersects = @mouseovers.intersectObjects objects
 
-	endEdit: () ->
-		@editor.$active = false
+			if intersects.length > 0
+				intersect = intersects[0]
+				ship = @app.getComponent intersect.object, 'ship', 'search up'
+				@shipControl.ship = ship
+			return
 
 module.exports = Game

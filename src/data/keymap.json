@@ -2,10 +2,16 @@
   "mouseAdd": 0,
   "mouseRemove": 2,
   "mouseDrag": 2,
+  "mouseSelect": 0,
   "zoomIn": "=",
   "zoomOut": "-",
-  "left": "left",
-  "right": "right",
-  "up": "up",
-  "down": "down"
+  "camera-left": "left",
+  "camera-right": "right",
+  "camera-up": "up",
+  "camera-down": "down",
+  "left": "a",
+  "right": "d",
+  "up": "w",
+  "down": "s",
+  "toggleEdit": "enter"
 }

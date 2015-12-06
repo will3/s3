@@ -8,11 +8,12 @@ class BlockModel
 		@chunk = new Chunk()
 		@gridSize = 1
 		@obj = null
-		@material = new THREE.MeshBasicMaterial
+		# @material = new THREE.MeshBasicMaterial
+			# vertexColors: true
+		@material = new THREE.MeshLambertMaterial
 			vertexColors: true
-		# @material = new THREE.MeshLambertMaterial
-		# 	vertexColors: true
 		@origin = new THREE.Vector3()
+		@wireframe = false
 
 	start: () -> 
 		@obj = new THREE.Object3D

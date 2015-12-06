@@ -1,4 +1,5 @@
 THREE = require 'three'
+$ = require 'jquery'
 
 scene = null
 camera = null
@@ -14,7 +15,7 @@ document.oncontextmenu = (e) ->
 initRenderer = () ->
 	renderer = new THREE.WebGLRenderer antialias: true
 	renderer.setSize window.innerWidth, window.innerHeight
-	document.body.appendChild renderer.domElement
+	$('#container').append renderer.domElement
 	renderer.setClearColor 0x111111
 
 	camera = new THREE.PerspectiveCamera(
@@ -76,6 +77,9 @@ initPostprocessing = () ->
 	ssaoPass.uniforms[ 'size' ].value.set window.innerWidth, window.innerHeight
 	ssaoPass.uniforms[ 'cameraNear' ].value = camera.near
 	ssaoPass.uniforms[ 'cameraFar' ].value = camera.far
+	ssaoPass.uniforms[ 'aoClamp' ].value = 0.5
+	ssaoPass.uniforms[ 'lumInfluence' ].value = 0.5
+	ssaoPass.uniforms[ 'aoAmount' ].value = 1.0
 	
 	composer = new THREE.EffectComposer renderer
 	composer.addPass renderPass
@@ -97,7 +101,8 @@ initApp = () ->
 	brock = require './core/index'
 	app = brock()
 
-	input = brock.input(window)
+	container = $('#container')[0]
+	input = brock.input container
 
 	app.use 'input', input
 	app.value 'camera', camera
@@ -105,18 +110,18 @@ initApp = () ->
 	app.value 'scene', scene
 	app.value 'app', app
 
-	require('./register.coffee')(app);
-	require('./setupgui.coffee')(app, scene);
-
-	return
-
-initScenario = () ->
-	app.attach camera, 'cameraController'
+	require('./register.coffee')(app)
 
 	root = new THREE.Object3D
 	scene.add root
-	game = app.attach root, 'game'
+	game = app.attach root, 'gameComponent'
 	app.value 'game', game
+
+	require('./setupgui.coffee')(app, scene);
+
+	app.attach camera, 'cameraController'
+
+	$('#container').focus()
 
 	return
 
@@ -124,4 +129,3 @@ initRenderer()
 initPostprocessing()
 animate()
 initApp()
-initScenario()

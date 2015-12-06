@@ -7,6 +7,10 @@ class Brock
 		@frameRate = 48.0
 		@world = require('./world.coffee')()
 		@systems = {}	
+		@tic = require('tic')()
+		
+		@events = require('./systems/events.coffee')()
+
 		@start()
 
 	getComponents: (object) ->
@@ -22,34 +26,58 @@ class Brock
 			component._type = type
 		component.object = object
 		@world.attach object, component
+
+		@events.emit 'attach', object, component
+
 		return component
 
 	dettach: (object, component) ->
-		@world.attach object, component
+		if component is undefined
+			components = @world.getComponents object
+			for component in components
+				@world.dettach object, component
+				@events.emit 'dettach', object, component
+			return
+
+		@world.dettach object, component
+		@events.emit 'dettach', object, component
 		return
+
+	destroy: (object) ->
+		@dettach object
+		if object.parent?
+			object.parent.remove object
 
 	component: (type, arg) ->
 		@_injector.service type, arg
 		return
+
+	system: (type, arg) ->
+		@_injector.service type, arg, true
 
 	value: (type, value) ->
 		@_injector.value type, value
 		return
 
 	use: (type, system) ->
-		@systems[type] = system
-		@_injector.value type, system
+		if system?
+			@systems[type] = system
+			@_injector.value type, system
+		else
+			system = @_injector.get type
+			@systems[type] = system
+
 		return
 
 	get: (type) ->
 		return @_injector.get type
 
-	tick: () ->
+	tick: (dt) ->
 		for type, system of @systems
 			if !system._started
 				system.start() if system.start isnt undefined
 				system._started = true
-			system.tick() if system.tick isnt undefined
+			system.tick(dt) if system.tick isnt undefined
 
 		@world.traverse (c) =>
 			if c.$active == false
@@ -57,7 +85,7 @@ class Brock
 			if !c._started
 				c.start() if c.start isnt undefined
 				c._started = true
-			c.tick() if c.tick isnt undefined
+			c.tick(dt) if c.tick isnt undefined
 
 		@world.traverse (c) =>
 			if c.$active == false
@@ -70,9 +98,17 @@ class Brock
 
 	start: () ->
 		interval = () =>
-			@_timeout = setTimeout(interval, 1000 / @frameRate)
-			@tick()
+			dt = 1000 / @frameRate
+			@_timeout = setTimeout(interval, dt)
+			@tic.tick(dt)
+			@tick(dt)
 		interval()
+
+	interval: (fn, time) ->
+		return @tic.interval(fn, time)
+
+	timeout: (fn, time) ->
+		return @tic.timeout(fn, time)
 
 module.exports = () -> 
 	new Brock()

@@ -22,7 +22,8 @@ THREE.SSAOShader = {
 		"cameraFar":    { type: "f", value: 100 },
 		"onlyAO":       { type: "i", value: 0 },
 		"aoClamp":      { type: "f", value: 0.5 },
-		"lumInfluence": { type: "f", value: 0.5 }
+		"lumInfluence": { type: "f", value: 0.5 },
+		"aoAmount"		: { type: "f", value: 1.0 }
 
 	},
 
@@ -51,6 +52,8 @@ THREE.SSAOShader = {
 		"uniform float aoClamp;",    // depth clamp - reduces haloing at screen edges
 
 		"uniform float lumInfluence;",  // how much luminance affects occlusion
+
+		"uniform float aoAmount;",		//how much ao applies overall
 
 		"uniform sampler2D tDiffuse;",
 		"uniform sampler2D tDepth;",
@@ -167,7 +170,7 @@ THREE.SSAOShader = {
 
 			"}",
 
-			"return temp1;",
+			"return temp1 * aoAmount;",
 
 		"}",
 

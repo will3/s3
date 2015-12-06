@@ -23,6 +23,8 @@ class BlockWireframe
 		geometry = new THREE.BoxGeometry @size, @size, @size
 		box = new THREE.Mesh geometry
 		@wireframe = new THREE.EdgesHelper box, @color
+		@wireframe.material.transparent = true
+		@wireframe.material.opacity = 0.5
 		@object.add @wireframe
 		geometry.dispose()
 		return

@@ -7,10 +7,8 @@
 	},
 	"engine": {
 		"img": "/images/cube.png",
-		"qty": 0
-	},	
-	"test": {
-		"img": "/images/cube.png",
-		"qty": 0
+		"qty": 0,
+		"color": "0x999999",
+		"component": "engine"
 	}
 }

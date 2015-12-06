@@ -20,6 +20,8 @@ class World
 		return
 
 	dettach: (object, component) ->
+		object = component.object
+		return if object is undefined
 		return if object._entityId is undefined
 		components = @scene[object._entityId]
 		return if components is undefined
@@ -40,7 +42,7 @@ class World
 		return
 
 	getComponents: (object) ->
-		return @scene[object._entityId]
+		return @scene[object._entityId] || []
 
 	getComponent: (object, type, option) ->
 		components = @getComponents object

@@ -15,6 +15,15 @@ class FixedSizeChunk
 		@dirty = true
 		return
 
+	visit: (callback) ->
+		shape = @map.shape
+		for i in [0..shape[0]]
+			for j in [0..shape[1]]
+				for k in [0..shape[2]]
+					stop = callback i, j, k, @map.get i, j, k
+					if stop
+						return stop
+
 	serialize: () ->
 		origin: @origin
 		chunkSize: @chunkSize
@@ -82,5 +91,11 @@ class Chunk
 		for c in chunks
 			chunk = new FixedSizeChunk()
 			chunk.deserialize(c)
+
+	visit: (callback) ->
+		for id, chunk of @chunks
+			stop = chunk.visit callback
+			if stop
+				return stop
 
 module.exports = Chunk

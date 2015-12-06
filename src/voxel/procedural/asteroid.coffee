@@ -60,7 +60,7 @@ module.exports = (params) ->
 				b = voxels.get i, j, k
 				if !b
 					continue
-				p = 0.05
+				p = 0.04
 				n = noise.noise3D(i * p, j * p, k * p)
 				index = Math.floor((n + 1) / 2 * colors.length)
 				voxels.set i, j, k, colors[index]
