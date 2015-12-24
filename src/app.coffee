@@ -117,8 +117,6 @@ initApp = () ->
 	game = app.attach root, 'gameComponent'
 	app.value 'game', game
 
-	require('./setupgui.coffee')(app, scene);
-
 	app.attach camera, 'cameraController'
 
 	$('#container').focus()

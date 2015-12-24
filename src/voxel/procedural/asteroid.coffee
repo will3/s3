@@ -17,7 +17,7 @@ module.exports = (params) ->
 
 	sphere = new THREE.SphereGeometry(1, widthSegments, heightSegments)
 
-	p = 0.8
+	p = 1.2
 
 	sphere.vertices.forEach (v) ->
 		n = noise.noise3D v.x * p, v.y * p, v.z * p
