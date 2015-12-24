@@ -9,7 +9,8 @@ class Brock
 		@systems = {}	
 		@tic = require('tic')()
 		
-		@events = require('./systems/events.coffee')()
+		Events = require './systems/events.coffee'
+		@events = new Events()
 
 		@start()
 

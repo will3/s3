@@ -1,5 +1,4 @@
 THREE = require 'three'
-DragCommand = require '../commands/dragcommand.coffee'
 blockModelUtils = require '../utils/blockmodelutils.coffee'
 
 # builds a ship

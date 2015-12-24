@@ -57,7 +57,7 @@ module.exports = function(grunt) {
     watch: {
       main: {
         files: ['src/index.html', 'src/bundle.js', 'src/images/*', 'src/gui/*.css', 'Gruntfile.js'],
-        tasks: ['mochaTest', 'copy'],
+        tasks: ['copy', 'mochaTest'],
         options: {
           livereload: true
         }

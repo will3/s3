@@ -1,21 +1,27 @@
 _ = require 'lodash'
 
-module.exports = () ->
-	listeners: {}
-	on: (event, callback) ->
-		if !@listeners[event]?
-			@listeners[event] = []
-		@listeners[event].push callback
+class Events
+	constructor: () ->
+		@_listeners = {}
 
-	emit: (event) ->
-		callbacks = @listeners[event] || []
-		args = Array.prototype.slice.call arguments
+	on: (event, callback) ->
+		if !@_listeners[event]?
+			@_listeners[event] = []
+		@_listeners[event].push callback
+
+	emit: (event, args...) ->
+		callbacks = @_listeners[event] || []
 		callbacks.forEach (callback) ->
-			callback.apply null, args.slice(1)
+			callback.apply null, args
 
 	removeListener: (event, callback) ->
-		if @listeners[event]?
-			_.pull @listeners[event], callback
+		if @_listeners[event]?
+			_.pull @_listeners[event], callback
 
 		if callback is undefined
-			@listeners[event] = []
+			@_listeners[event] = []
+
+	listeners: (event) ->
+		return @_listeners[event] || []
+
+module.exports = Events
