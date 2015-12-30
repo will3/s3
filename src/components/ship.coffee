@@ -1,5 +1,3 @@
-chunkUtils = require '../utils/chunkutils.coffee'
-
 class Ship
 	@$inject: ['app']
 

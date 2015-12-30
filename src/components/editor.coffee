@@ -1,5 +1,4 @@
 THREE = require 'three'
-blockModelUtils = require '../utils/blockmodelutils.coffee'
 
 # builds a ship
 class Editor
