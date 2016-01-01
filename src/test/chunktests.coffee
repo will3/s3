@@ -20,18 +20,6 @@ describe 'Chunk', () ->
 			origin = chunk.getOrigin 17, 33, 21
 			expect(origin).to.eql [16, 32, 16]
 
-	describe 'addChunk', () ->
-		it 'adds chunk and can get after', () ->
-			chunk = new Chunk(16)
-			sub = chunk.addChunk(1, 2, 3)
-			expect(chunk.getChunk(0, 0, 0)).to.equal sub
-
-	describe 'hasChunk', () ->
-		it 'returns true when there is chunk', () ->
-			chunk = new Chunk(16)
-			chunk.addChunk(1, 2, 3)
-			expect(chunk.hasChunk(0, 0, 0)).to.be.true
-
 		it 'returns false when there is no chunk', () ->
 			chunk = new Chunk(16)
 			expect(chunk.hasChunk(0, 0, 0)).to.be.false

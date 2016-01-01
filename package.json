@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "watchify -t coffeeify ./src/app.coffee -o ./src/bundle.js -v",
+    "build": "watchify -t coffeeify ./src/app.coffee -o ./src/bundle.js -v --debug",
     "test": "grunt mochaTest"
   },
   "author": "",

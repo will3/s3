@@ -1,94 +1,44 @@
 _ = require 'lodash'
 THREE = require 'three'
-mesher = require '../voxel/mesher'
 Chunk = require '../voxel/chunk.coffee'
 
 class BlockModel
 	constructor: () ->
 		@chunk = new Chunk()
 		@gridSize = 1
-		@obj = null
-		# @material = new THREE.MeshBasicMaterial
-			# vertexColors: true
-		@material = new THREE.MeshLambertMaterial
-			vertexColors: true
 		@origin = new THREE.Vector3()
-		@wireframe = false
-
-	start: () -> 
-		@obj = new THREE.Object3D
-		@object.add(@obj)
-		return
-
-	tick: () -> 
-		for id, chunk of @chunk.chunks when chunk.dirty
-			@updateChunk chunk
-			chunk.dirty = false
-		return
 
 	set: (x, y, z, obj) ->
 		@chunk.set x, y, z, obj
 		return
 
+	setAtCoord: (coord, obj) ->
+		@chunk.set coord.x, coord.y, coord.z, obj
+
 	get: (x, y, z) ->
 		@chunk.get x, y, z
-		
-	dispose: () ->
-		@material.dispose()
-		for id, chunk of @chunks
-			chunk.geometry.dispose()
-		@object.remove @obj
 
-	updateChunk: (chunk) ->
-		mesh = chunk.mesh
-		map = chunk.map
-		if mesh isnt null
-			@obj.remove mesh
-			mesh.geometry.dispose()
-			mesh.material.dispose()
+	serialize: () ->
+		body = {}
+		body.gridSize = @gridSize;
+		body.origin = [@origin.x, @origin.y, @origin.z]
+		body.chunk = []
+		@chunk.visit (i, j, k, value) ->
+			body.chunk.push [i, j, k, value] if !!value
 
-		result = mesher map.data, map.shape
+		return body
 
-		geometry = new THREE.Geometry
-		geometry.vertices = result.vertices.map (v) =>
-			new THREE.Vector3 v[0], v[1], v[2]
-				.add @origin
-				.sub new THREE.Vector3 0.5, 0.5, 0.5
-				.multiplyScalar @gridSize
+	deserialize: (body) ->
+		@gridSize = body.gridSize
+		@origin = new THREE.Vector3 body.origin[0], body.origin[1], body.origin[2]
+		# dispose chunk geometries
+		for id, chunk of @chunk
+			chunk.geometry.dispose() if chunk.geometry?
 
-		geometry.faces = result.faces.map (f) =>
-			face = new THREE.Face3 f[0], f[1], f[2]
-			face.color = new THREE.Color f[3]
-			return face
+		@chunk = new Chunk()
+		for v in body.chunk
+			@chunk.set v[0], v[1], v[2], v[3]
 
-		geometry.computeFaceNormals()
-
-		mesh = new THREE.Mesh geometry, @material
-		chunk.mesh = mesh
-
-		origin = new THREE.Vector3(
-			chunk.origin[0] * @gridSize
-			chunk.origin[1] * @gridSize
-			chunk.origin[2] * @gridSize
-			)
-		mesh.position.copy origin
-
-		@obj.add mesh
-		return
-
-	pointToCoord: (point) ->
-		coord = point.clone().multiplyScalar(1 / @gridSize)
-		.sub @origin
-
-		coord = new THREE.Vector3(
-			Math.round coord.x
-			Math.round coord.y
-			Math.round coord.z
-		)
-
-	coordToPoint: (coord) ->
-		new THREE.Vector3 coord.x, coord.y, coord.z
-				.add @origin
-				.multiplyScalar @gridSize 
+		return @
 
 module.exports = BlockModel

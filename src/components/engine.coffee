@@ -1,12 +1,11 @@
 THREE = require 'three'
-Directions = require '../directions.coffee'
 directionUtils = require '../utils/directionutils.coffee'
 
 class Engine
 	@$inject: ['app', 'scene', 'particleGroups']
 
 	constructor: (@app, @scene, @particleGroups) ->
-		@direction = Directions.Back
+		@direction = 'back'
 		@gap = 1
 
 	start: () ->

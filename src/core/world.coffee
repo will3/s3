@@ -44,16 +44,8 @@ class World
 	getComponents: (object) ->
 		return @scene[object._entityId] || []
 
-	getComponent: (object, type, option) ->
+	getComponent: (object, type) ->
 		components = @getComponents object
-
-		if option == 'search up'
-			found = _.find components, (c) ->
-				c._type == type
-
-			return found if found?
-			return undefined if not object.parent?
-			return @getComponent object.parent, type, option
 
 		return _.find components, (c) ->
 			return c._type == type

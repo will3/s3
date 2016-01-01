@@ -117,11 +117,32 @@ initApp = () ->
 	game = app.attach root, 'gameComponent'
 	app.value 'game', game
 
-	require('./setupgui.coffee')(app, scene);
-
-	app.attach camera, 'cameraController'
-
 	$('#container').focus()
+
+	cpr
+		palette: [
+			'rgb(249, 246, 51)', 
+			'rgb(110, 236, 167)', 
+			'rgb(39, 151, 251)',
+			'rgb(237, 72, 81)',
+			'rgb(242, 137, 66)',
+			'#f6f6f6'
+		],
+		click: (color) ->
+			game.colorSelected color
+		focus: () ->
+			#got focus 
+		blur: () ->
+			#lost focus 
+
+	menu = 
+		'engine': () ->
+			game.editor.component = 'engine'
+
+	gui = new dat.GUI()
+
+	components = gui.addFolder 'components'
+	components.add menu, 'engine'
 
 	return
 

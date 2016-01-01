@@ -13,5 +13,9 @@
   "right": "d",
   "up": "w",
   "down": "s",
-  "toggleEdit": "enter"
+  "toggleEdit": "enter",
+  "rotateLeft": "a",
+  "rotateRight": "d",
+  "rotateUp": "w",
+  "rotateDown": "s"
 }

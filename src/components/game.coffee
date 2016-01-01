@@ -2,9 +2,9 @@ THREE = require 'three'
 _ = require 'lodash'
 
 class Game
-	@$inject: ['scene', 'app', 'input', 'keyMap', 'mouseovers', 'events']
+	@$inject: ['scene', 'app', 'input', 'keyMap', 'mouseovers', 'events', 'camera']
 
-	constructor: (@scene, @app, @input, @keyMap, @mouseovers, @events) ->
+	constructor: (@scene, @app, @input, @keyMap, @mouseovers, @events, @camera) ->
 		@editMode = false
 		@blockType = 'default'	#selected block type
 		@attachListener = null
@@ -12,49 +12,27 @@ class Game
 		@selectables = []
 		@selection = null
 		@shipControl = null
+		@editor = null
 
 	start: () ->
-		# add asteroid
-		object = new THREE.Object3D()
-		@scene.add object
-		blockModel = @app.attach object, 'blockModel'
-		@app.attach object, 'asteroid'
+		# @scene.add prefab_asteroid(@app)
+		
+		obj = @app.addPrefab @scene, 'editor'
+		@editor = @app.getComponent obj, 'editor'
 
-		root = new THREE.Object3D()
-		@scene.add root
-		@app.attach root, 'editor'
-		@shipControl = @app.attach root, 'shipControl'
+		# root = new THREE.Object3D()
+		# @scene.add root
+		# @app.attach root, 'editor'
+		# @shipControl = @app.attach root, 'shipControl'
 
-		@events.on 'attach', @attachListener = (object, component) =>
-			if component._type == 'selectable'
-				@selectables.push component
-			return
-
-		@events.on 'dettach', @dettachListener = (object, component) =>
-			_.pull @selectables, component
-			return
+		@app.attach @camera, 'cameraController'
 		
 		return
 
-	tick: () ->
-		@updateInput()
-		return
-
-	dispose: () ->
-		@events.removeListener 'attach', @attachListener
-		@events.removeListener 'dettach', @dettachListener
-
-	updateInput: () ->
-		inputState = @input.state
-
-		if inputState.mouseDown @keyMap.mouseSelect
-			objects = _.map @selectables, 'object'
-			intersects = @mouseovers.intersectObjects objects
-
-			if intersects.length > 0
-				intersect = intersects[0]
-				ship = @app.getComponent intersect.object, 'ship', 'search up'
-				@shipControl.ship = ship
-			return
+	colorSelected: (color) ->
+		rgbString = color.toRgbString()
+		threeColor = new THREE.Color rgbString
+		hex = threeColor.getHex()
+		@editor.color = hex
 
 module.exports = Game

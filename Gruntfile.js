@@ -16,6 +16,9 @@ module.exports = function(grunt) {
             'bower_components/lodash/lodash.min.js',
             'bower_components/jquery/dist/jquery.min.js',
             'bower_components/jquery/dist/jquery.min.map',
+            'bower_components/cpr/cpr.js',
+            'bower_components/tinycolor/dist/tinycolor-min.js',
+            'bower_components/dat-gui/build/dat.gui.min.js',
             'node_modules/shader-particle-engine/build/SPE.min.js'
           ],
           dest: 'dist/js/vendor'
@@ -32,7 +35,7 @@ module.exports = function(grunt) {
         }, {
           expand: true,
           flatten: true,
-          src: ['src/gui/gui.css'],
+          src: ['bower_components/cpr/cpr.css'],
           dest: 'dist/css'
         }, {
           expand: true,

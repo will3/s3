@@ -1,8 +1,9 @@
 THREE = require 'three'
-
+Injector = require './injector.coffee'
 class Brock
 	constructor: () ->
-		@_injector = require('./injector.coffee')()
+		@_injector = new Injector()
+		@_injector_prefab = new Injector()
 		@_timeout = null
 		@frameRate = 48.0
 		@world = require('./world.coffee')()
@@ -17,8 +18,8 @@ class Brock
 	getComponents: (object) ->
 		return @world.getComponents object
 
-	getComponent: (object, type, option) ->
-		return @world.getComponent object, type, option
+	getComponent: (object, type) ->
+		return @world.getComponent object, type
 
 	attach: (object, component) ->
 		if typeof component is 'string'
@@ -44,6 +45,15 @@ class Brock
 		@events.emit 'dettach', object, component
 		return
 
+	addPrefab: (object, prefab) ->
+		if typeof	prefab is 'string'
+			prefab = @_injector_prefab.get prefab
+
+		obj = prefab @
+		object.add obj
+
+		obj
+
 	destroy: (object) ->
 		@dettach object
 		if object.parent?
@@ -58,6 +68,10 @@ class Brock
 
 	value: (type, value) ->
 		@_injector.value type, value
+		return
+
+	prefab: (type, arg) ->
+		@_injector_prefab.value type, arg
 		return
 
 	use: (type, system) ->
@@ -81,16 +95,14 @@ class Brock
 			system.tick(dt) if system.tick isnt undefined
 
 		@world.traverse (c) =>
-			if c.$active == false
-				return
 			if !c._started
 				c.start() if c.start isnt undefined
 				c._started = true
+
+		@world.traverse (c) =>
 			c.tick(dt) if c.tick isnt undefined
 
 		@world.traverse (c) =>
-			if c.$active == false
-				return
 			c.lateTick() if c.lateTick isnt undefined
 
 		for type, system of @systems
