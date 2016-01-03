@@ -1,4 +1,4 @@
-Events = require '../systems/events'
+Events = require '../events'
 expect = require('chai').expect
 
 describe 'Events', () ->

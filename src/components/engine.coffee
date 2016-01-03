@@ -7,8 +7,14 @@ class Engine
 	constructor: (@app, @scene, @particleGroups) ->
 		@direction = 'back'
 		@gap = 1
+		@emitter = null
+		@particleGroup = null
+		@amount = 0
+		@size = 1.8
+		@thrust = 0.005
 
 	start: () ->
+		# create particle group
 		@particleGroup = @particleGroups.get 'engine'
 		if @particleGroup is undefined
 			@particleGroup = new SPE.Group
@@ -17,11 +23,21 @@ class Engine
 				maxParticleCount: 10000
 			@particleGroups.add 'engine', @particleGroup
 
-		emitter = new SPE.Emitter(@getEmitterOptions())
+		# add an emitter
+		@emitter = new SPE.Emitter(@getEmitterOptions())
 
-		@particleGroup.addEmitter emitter
+		@particleGroup.addEmitter @emitter
 		@scene.add @particleGroup.mesh
 		return
+
+	tick: () ->
+		@emitter.position.value = @getPosition()
+		@emitter.velocity.value = @getVelocity()
+		# @emitter.size.value = [@size * @amount, 0]
+		# if @amount == 0
+		# 	@emitter.disable()
+		# else
+		# 	@emitter.enable()
 
 	getEmitterOptions: () ->
   	options =
@@ -33,8 +49,7 @@ class Engine
 			velocity:
 			  value:	@getVelocity()
 			size:
-			  value:	[1, 0]
-			  spread: [1, 0]
+			  value:	[@size, 0]
 			opacity:
 				value: 	0.3
 			particleCount:	100
@@ -47,5 +62,8 @@ class Engine
 		localQuat = directionUtils.getQuat @direction
 		quat = @object.getWorldQuaternion().multiply localQuat
 		velocity = directionUtils.quatToVector(quat).setLength 4
+
+	dispose: () ->
+		@emitter.disable()	
 
 module.exports = Engine

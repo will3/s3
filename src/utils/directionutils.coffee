@@ -19,5 +19,5 @@ module.exports =
 		)
 
 	quatToVector: (quat, from = 'front') ->
-		front = @getVector Directions.Front
+		front = @getVector 'front'
 		front.applyQuaternion quat

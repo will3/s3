@@ -5,7 +5,6 @@ class FixedSizeChunk
 		@origin = [0, 0, 0]
 		@map = ndarray [], [@chunkSize, @chunkSize, @chunkSize]
 		@dirty = false
-		@mesh = null
 
 	get: (x, y, z) ->
 		return @map.get x - @origin[0], y - @origin[1], z - @origin[2]
@@ -20,7 +19,8 @@ class FixedSizeChunk
 		for i in [0...shape[0]]
 			for j in [0...shape[1]]
 				for k in [0...shape[2]]
-					callback i, j, k, @map.get i, j, k
+					v = @map.get i, j, k
+					callback i, j, k, v if !!v
 
 class Chunk
 	constructor: (@chunkSize = 16) ->

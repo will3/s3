@@ -8,6 +8,7 @@ app = null
 depthMaterial = null
 composer = null
 depthTarget = null
+editor = null
 
 document.oncontextmenu = (e) ->
 	e.preventDefault()
@@ -24,7 +25,18 @@ initRenderer = () ->
 		0.1,
 		1000
 	);
-	camera.position.z = 50
+
+	# width = window.innerWidth * 0.1
+	# height = window.innerHeight * 0.1
+	# camera = new THREE.OrthographicCamera( 
+	# 	width / - 2, 
+	# 	width / 2, 
+	# 	height / 2, 
+	# 	height / - 2, 
+	# 	1, 
+	# 	1000 
+	# )
+
 	scene = new THREE.Scene
 
 	window.addEventListener('resize', () ->
@@ -114,8 +126,22 @@ initApp = () ->
 
 	root = new THREE.Object3D
 	scene.add root
-	game = app.attach root, 'gameComponent'
-	app.value 'game', game
+
+	objEditor = app.addPrefab scene, 'editor'
+	editor = app.getComponent objEditor, 'editor'
+
+	objShip = app.addPrefab scene, 'ship'
+	blockModel = app.getComponent objShip, 'blockModel'
+	blockAttachments = app.getComponent objShip, 'blockAttachments'
+	editor.blockModel = blockModel
+	editor.blockAttachments = blockAttachments
+
+
+	# app.addPrefab scene, 'asteroid'
+
+	# app.addPrefab scene, 'laserAmmo'
+
+	app.attach camera, 'cameraController'
 
 	$('#container').focus()
 
@@ -129,20 +155,17 @@ initApp = () ->
 			'#f6f6f6'
 		],
 		click: (color) ->
-			game.colorSelected color
+			rgbString = color.toRgbString()
+			threeColor = new THREE.Color rgbString
+			hex = threeColor.getHex()
+			editor.color = hex
 		focus: () ->
 			#got focus 
 		blur: () ->
 			#lost focus 
 
-	menu = 
-		'engine': () ->
-			game.editor.component = 'engine'
-
-	gui = new dat.GUI()
-
-	components = gui.addFolder 'components'
-	components.add menu, 'engine'
+	addMenu = require './addmenu.coffee'
+	addMenu editor
 
 	return
 

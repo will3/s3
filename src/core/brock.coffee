@@ -10,7 +10,7 @@ class Brock
 		@systems = {}	
 		@tic = require('tic')()
 		
-		Events = require './systems/events.coffee'
+		Events = require './events.coffee'
 		@events = new Events()
 
 		@start()
@@ -36,6 +36,7 @@ class Brock
 	dettach: (object, component) ->
 		if component is undefined
 			components = @world.getComponents object
+			components = components.splice()
 			for component in components
 				@world.dettach object, component
 				@events.emit 'dettach', object, component
@@ -100,6 +101,9 @@ class Brock
 				c._started = true
 
 		@world.traverse (c) =>
+			if !c._started
+				c.start() if c.start isnt undefined
+				c._started = true
 			c.tick(dt) if c.tick isnt undefined
 
 		@world.traverse (c) =>
@@ -125,3 +129,5 @@ class Brock
 
 module.exports = () -> 
 	new Brock()
+
+module.exports.Events = require './events.coffee'

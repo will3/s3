@@ -3,17 +3,15 @@ mesher = require '../voxel/mesher'
 class BlockMesher
 	@$inject: ['app']
 	constructor: (@app) ->
-		@dirty = false
 		@blockModel = null
-		@obj = null
 		@material = new THREE.MeshLambertMaterial
 			vertexColors: true
+		@obj = null
 
 	start: () ->
 		if @blockModel is null
 			throw new Error 'blockModel cannot be null'
-		@obj = new THREE.Object3D
-		@object.add(@obj)
+		@obj = @blockModel.objModel
 		return
 
 	tick: () ->
@@ -21,15 +19,15 @@ class BlockMesher
 		for id, chunk of chunk.chunks when chunk.dirty
 			@updateChunk chunk
 			chunk.dirty = false
+
 		return
 
 	updateChunk: (chunk) ->
-		origin = @blockModel.origin
 		gridSize = @blockModel.gridSize
 
 		mesh = chunk.mesh
 		map = chunk.map
-		if mesh isnt null
+		if mesh?
 			@obj.remove mesh
 			mesh.geometry.dispose()
 			mesh.material.dispose()
@@ -39,7 +37,6 @@ class BlockMesher
 		geometry = new THREE.Geometry
 		geometry.vertices = result.vertices.map (v) =>
 			new THREE.Vector3 v[0], v[1], v[2]
-				.add origin
 				.sub new THREE.Vector3 0.5, 0.5, 0.5
 				.multiplyScalar gridSize
 
@@ -53,12 +50,12 @@ class BlockMesher
 		mesh = new THREE.Mesh geometry, @material
 		chunk.mesh = mesh
 
-		origin = new THREE.Vector3(
+		offset = new THREE.Vector3(
 			chunk.origin[0] * gridSize
 			chunk.origin[1] * gridSize
 			chunk.origin[2] * gridSize
 			)
-		mesh.position.copy origin
+		mesh.position.copy offset
 
 		@obj.add mesh
 		return
