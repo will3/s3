@@ -1,24 +1,40 @@
 chunkUtils = require '../utils/chunkutils.coffee'
-module.exports = (app) ->
+BlockLoader = require '../blockloader.coffee'
+
+module.exports = (app, options = {}) ->
+	control = options.control || false
+	data = options.data
+
 	object = new THREE.Object3D()
 	blockModel = app.attach object, 'blockModel'
-	model = require '../data/ship0.json'
-	blockModel.deserialize model
-	blockModel.origin = chunkUtils.ccw blockModel.chunk
 
 	blockMesher = app.attach object, 'blockMesher'
-	shipControl = app.attach object, 'shipControl'
+
+	if control
+		shipControl = app.attach object, 'shipControl'
+
 	ship = app.attach object, 'ship'
 	rigidBody = app.attach object, 'rigidBody'
 	blockAttachments = app.attach object, 'blockAttachments'
+	cooldown = app.attach object, 'cooldown'
+
+	if control
+		shipControl.cooldown = cooldown
+		shipControl.ship = ship
 
 	blockAttachments.blockModel = blockModel
 
-	shipControl.ship = ship
-
 	ship.rigidBody = rigidBody
 	ship.blockAttachments = blockAttachments
+	ship.blockModel = blockModel
 
 	blockMesher.blockModel = blockModel
+
+	if data?
+		loader = new BlockLoader()
+		loader.load app, object, data
+		ship.updateRadius()
+
+
 
 	return object

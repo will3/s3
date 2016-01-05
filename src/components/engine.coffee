@@ -2,9 +2,9 @@ THREE = require 'three'
 directionUtils = require '../utils/directionutils.coffee'
 
 class Engine
-	@$inject: ['app', 'scene', 'particleGroups']
+	@$inject: ['app', 'scene', 'particleGroups', 'textures']
 
-	constructor: (@app, @scene, @particleGroups) ->
+	constructor: (@app, @scene, @particleGroups, @textures) ->
 		@direction = 'back'
 		@gap = 1
 		@emitter = null
@@ -19,7 +19,7 @@ class Engine
 		if @particleGroup is undefined
 			@particleGroup = new SPE.Group
 				texture:
-					value: THREE.ImageUtils.loadTexture '/images/default.png'
+					value: @textures.get 'default'
 				maxParticleCount: 10000
 			@particleGroups.add 'engine', @particleGroup
 
@@ -33,11 +33,11 @@ class Engine
 	tick: () ->
 		@emitter.position.value = @getPosition()
 		@emitter.velocity.value = @getVelocity()
-		# @emitter.size.value = [@size * @amount, 0]
-		# if @amount == 0
-		# 	@emitter.disable()
-		# else
-		# 	@emitter.enable()
+		@emitter.size.value = [@size * @amount, 0]
+		if @amount == 0
+			@emitter.disable()
+		else
+			@emitter.enable()
 
 	getEmitterOptions: () ->
   	options =

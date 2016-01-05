@@ -17,5 +17,6 @@
   "rotateLeft": "a",
   "rotateRight": "d",
   "rotateUp": "w",
-  "rotateDown": "s"
+  "rotateDown": "s",
+  "fire": "j"
 }

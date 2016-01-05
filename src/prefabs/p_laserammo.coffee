@@ -7,6 +7,7 @@ module.exports = (app) ->
 	
 	rigidBody = app.attach object, 'rigidBody'
 	rigidBody.friction = 1
+	rigidBody.radius = 1
 
 	selfDestruct = app.attach object, 'selfDestruct'
 	selfDestruct.life = 1000

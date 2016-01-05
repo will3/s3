@@ -3,6 +3,15 @@ class ShipControl
 
 	constructor: (@input, @keyMap, @app) ->
 		@ship = null
+		@turnAccelerateAmount = 0.5
+		@cooldown = null
+		@sequentialFireInterval = 100
+
+	start: () ->
+		if @cooldown is null
+			throw new Error 'cooldown cannot be empty'
+
+		@cooldown.add 'sequential fire', @sequentialFireInterval
 
 	tick: () ->
 		if @ship == null
@@ -23,6 +32,15 @@ class ShipControl
 			rightAmount++
 
 		@ship.bank rightAmount
+
+		if rightAmount isnt 0 and upAmount is 0
+			upAmount = @turnAccelerateAmount
+
 		@ship.accelerate upAmount
+
+		if @cooldown.ready 'sequential fire'
+			if inputState.keyHold @keyMap.fire
+				@ship.fireNext()
+				@cooldown.refresh 'sequential fire'
 
 module.exports = ShipControl

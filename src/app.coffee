@@ -9,6 +9,8 @@ depthMaterial = null
 composer = null
 depthTarget = null
 editor = null
+ssaoPass = null
+rendererStats = null
 
 document.oncontextmenu = (e) ->
 	e.preventDefault()
@@ -42,7 +44,7 @@ initRenderer = () ->
 	window.addEventListener('resize', () ->
 		width = window.innerWidth
 		height = window.innerHeight
-		renderer.setSize(width, window.height)
+		renderer.setSize(width, height)
 		camera.aspect = width / height
 		camera.updateProjectionMatrix()
 
@@ -61,6 +63,12 @@ initRenderer = () ->
 	directionalLight = new THREE.DirectionalLight 0xffffff, 0.4
 	directionalLight.position.set 0.5, 1.0, 0.3
 	scene.add directionalLight
+
+	rendererStats = new THREEx.RendererStats()
+	rendererStats.domElement.style.position = 'absolute'
+	rendererStats.domElement.style.left = '20px'
+	rendererStats.domElement.style.top   = '20px'
+	document.body.appendChild rendererStats.domElement
 		
 	return
 
@@ -109,6 +117,8 @@ render = () ->
 	scene.overrideMaterial = null
 	composer.render()
 
+	rendererStats.update(renderer)
+
 initApp = () ->
 	brock = require './core/index'
 	app = brock()
@@ -127,19 +137,30 @@ initApp = () ->
 	root = new THREE.Object3D
 	scene.add root
 
-	objEditor = app.addPrefab scene, 'editor'
-	editor = app.getComponent objEditor, 'editor'
+	# objEditor = app.addPrefab scene, 'editor'
+	# editor = app.getComponent objEditor, 'editor'
 
-	objShip = app.addPrefab scene, 'ship'
-	blockModel = app.getComponent objShip, 'blockModel'
-	blockAttachments = app.getComponent objShip, 'blockAttachments'
-	editor.blockModel = blockModel
-	editor.blockAttachments = blockAttachments
-
+	# objShip = app.addPrefab scene, 'ship'
+	# blockModel = app.getComponent objShip, 'blockModel'
+	# blockAttachments = app.getComponent objShip, 'blockAttachments'
+	# editor.blockModel = blockModel
+	# editor.blockAttachments = blockAttachments
 
 	# app.addPrefab scene, 'asteroid'
+	ship1 = app.addPrefab scene, 'ship',
+		data: require './data/ship0.json'
+	ship1.position.set 100, 0, 0
+
+	ship2 = app.addPrefab scene, 'ship', 
+		control: true
+		data: require './data/ship0.json'
 
 	# app.addPrefab scene, 'laserAmmo'
+
+	# obj = new THREE.Object3D()
+	# scene.add obj
+	# lineSprite = app.attach obj, 'lineSprite'
+	# lineSprite.texture = require('./textures.coffee').get 'laser'
 
 	app.attach camera, 'cameraController'
 

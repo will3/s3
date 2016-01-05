@@ -17,9 +17,9 @@ module.exports = (editor) ->
 		'clear': () ->
 			editor.clear()
 		'leave dock': () ->
-			editor.active = !editor.active
+			editor.toggleEdit()
 		'print': () ->
-			alert JSON.stringify editor.blockModel.serialize()
+			alert JSON.stringify editor.data()
 
 	gui = new dat.GUI()
 

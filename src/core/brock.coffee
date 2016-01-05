@@ -34,29 +34,29 @@ class Brock
 		return component
 
 	dettach: (object, component) ->
-		if component is undefined
-			components = @world.getComponents object
-			components = components.splice()
-			for component in components
-				@world.dettach object, component
-				@events.emit 'dettach', object, component
-			return
-
 		@world.dettach object, component
 		@events.emit 'dettach', object, component
 		return
 
-	addPrefab: (object, prefab) ->
+	dettachAll: (object, recursive) ->
+		components = @getComponents(object).slice()
+		for component in components
+			@dettach object, component
+
+		for child in object.children
+			@dettachAll child
+
+	addPrefab: (object, prefab, options...) ->
 		if typeof	prefab is 'string'
 			prefab = @_injector_prefab.get prefab
 
-		obj = prefab @
+		obj = prefab @, options...
 		object.add obj
 
 		obj
 
 	destroy: (object) ->
-		@dettach object
+		@dettachAll object
 		if object.parent?
 			object.parent.remove object
 
@@ -82,6 +82,11 @@ class Brock
 		else
 			system = @_injector.get type
 			@systems[type] = system
+
+		system.app = @
+
+		if system.initialized?
+			system.initialized()
 
 		return
 

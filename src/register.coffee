@@ -5,6 +5,7 @@ module.exports = (app) ->
 	app.value 'events', app.events
 	app.value 'geometries', {}
 	app.value 'materials', {}
+	app.value 'textures', require './textures.coffee'
 
 	# components
 	app.component 'blockModel', require './components/blockmodel.coffee'
@@ -24,10 +25,14 @@ module.exports = (app) ->
 	app.component 'laserAmmo', require './components/laserammo.coffee'
 	app.component 'selfDestruct', require './components/selfdestruct.coffee'
 	app.component 'cooldown', require './components/cooldown.coffee'
+	app.component 'lineSprite', require './components/linesprite.coffee'
 	
 	# systems
 	app.system 'particleGroups', require './systems/particlegroups.coffee'
+	app.system 'collision', require './systems/collision.coffee'
+
 	app.use 'particleGroups'
+	app.use 'collision'
 
 	# prefabs
 	app.prefab 'asteroid', require './prefabs/p_asteroid.coffee'

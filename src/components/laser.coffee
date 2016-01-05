@@ -3,33 +3,35 @@ class Laser
 
 	constructor: (@app, @scene) ->
 		@color = 0xff0000
-		@edges = null
 		@cooldown = null
-		@fireInterval = 1000
+		@fireInterval = 200
+		@gap = 2
+		@dir = new THREE.Vector3 0, 0, 1
+		@autofire = false
 
 	start: () ->
 		if @cooldown is null
 			throw new Error 'cooldown cannot be empty'
 
-		geometry = new THREE.BoxGeometry 1, 1, 1
-		box = new THREE.Mesh geometry
-		@edges = new THREE.EdgesHelper box, @color
-		@object.add @edges
-		geometry.dispose()
-
 		@cooldown.add 'fire', @fireInterval
 
 	tick: () ->
-		if @cooldown.ready 'fire'
+		if @autofire
 			@fire()
-			@cooldown.refresh 'fire'
 
 	fire: () ->
-		objLaser = @app.addPrefab @scene, 'laserAmmo'
-		objLaser.position.copy @object.getWorldPosition()
+		if @cooldown.ready 'fire'
+				@_fire()
+				@cooldown.refresh 'fire'
 
-	dispose: () ->
-		@edges.geometry.dispose()
-		@edges.material.dispose()
+	_fire: () ->
+		objAmmo = @app.addPrefab @scene, 'laserAmmo'
+
+		forward = @dir.clone().applyEuler @object.getWorldRotation()
+
+		objAmmo.position.copy @object.getWorldPosition().add forward.clone().setLength @gap
+
+		laserAmmo = @app.getComponent objAmmo, 'laserAmmo'
+		laserAmmo.dir = forward
 
 module.exports = Laser

@@ -16,7 +16,7 @@ class Editor
 		@blockAttachments = null
 		@commands = []
 		@redos = []
-		@active = true
+		@edit = true
 
 	start: () ->
 		if @grid is null
@@ -28,37 +28,27 @@ class Editor
 		if @blockAttachments is null
 			throw new Error 'blockAttachments cannot be empty'
 
-		# deserialize block model
-		blockModelData = JSON.parse window.localStorage.getItem 'blockModel'
-		if blockModelData isnt null
-			@blockModel.deserialize blockModelData
-
-		# deserialize block attachments
-		blockAttachmentsData = JSON.parse window.localStorage.getItem 'blockAttachments'
-		if blockAttachmentsData isnt null
-			@blockAttachments.deserialize blockAttachmentsData
-
+		try
+			editorData = JSON.parse window.localStorage.getItem 'editor'
+			if editorData isnt null
+				blockModelData = editorData.blockModel
+				@blockModel.deserialize blockModelData if blockModelData?
+				blockAttachmentsData = editorData.blockAttachments
+				@blockAttachments.deserialize blockAttachmentsData if blockAttachmentsData?
+		catch ex
+			console.log 'failed to parse localStorage'
+			
 		geometry = new THREE.PlaneGeometry(999, 999)
 		geometry.vertices.forEach (v) =>
 			v.applyEuler new THREE.Euler -Math.PI / 2, 0, 0
 			v.y = 0
 		@ground = new THREE.Mesh geometry
 
+		@updateEdit()
+
 		return
 
 	tick: () ->
-		if @active
-			@grid.object.visible = true
-			@blockPreview.object.visible = true
-			@blockModel.origin = new THREE.Vector3 0, 0, 0
-		else
-			@grid.object.visible = false
-			@blockPreview.object.visible = false
-			ccw = chunkUtils.ccw @blockModel.chunk
-			@blockModel.origin = ccw
-
-			return
-
 		@groundIntersect = coordUtils.mouseIntersect @input, @window, @camera, [@ground] 
 		@blockIntersect = if @blockModel is null then null else coordUtils.mouseIntersect @input, @window, @camera, [@blockModel.object]
 		inputState = @input.state
@@ -104,12 +94,17 @@ class Editor
 		return
 
 	saveInLocalStorage: () ->
-		window.localStorage.setItem 'blockModel', JSON.stringify @blockModel.serialize()
-		window.localStorage.setItem 'blockAttachments', JSON.stringify @blockAttachments.serialize()
+		data = 
+			blockModel: @blockModel.serialize()
+			blockAttachments: @blockAttachments.serialize()
+
+		window.localStorage.setItem 'editor', JSON.stringify data
+			
+	data: () ->
+		return JSON.parse window.localStorage.getItem 'editor'
 
 	clear: () ->
-		window.localStorage.setItem 'blockModel', null
-		window.localStorage.setItem 'blockAttachments', null
+		window.localStorage.removeItem 'editor'
 
 	undo: () ->
 
@@ -121,5 +116,30 @@ class Editor
 
 	dispose: () ->
 		@ground.geometry.dispose()
+
+	updateEdit: () ->
+		if @edit
+			@grid.object.visible = true
+			@blockPreview.object.visible = true
+			@blockModel.origin = new THREE.Vector3 0, 0, 0
+		else
+			@grid.object.visible = false
+			@blockPreview.object.visible = false
+			ccw = chunkUtils.ccw @blockModel.chunk
+			@blockModel.origin = ccw
+
+	startEdit: () ->
+		@edit = true
+		@updateEdit()
+
+	endEdit: () ->
+		@edit = false
+		@updateEdit()
+
+	toggleEdit: () ->
+		if @edit
+			endEdit()
+		else
+			startEdit()
 
 module.exports = Editor

@@ -20,21 +20,11 @@ class World
 		return
 
 	dettach: (object, component) ->
-		object = component.object
-		return if object is undefined
 		return if object._entityId is undefined
 		components = @scene[object._entityId]
-		return if components is undefined
-
-		if component is undefined
-			components.forEach (c) ->
-				c.dispose() if c.dispose isnt undefined
-
-			delete @scene[object._entityId]
-			return
+		return if component is undefined
 
 		component.dispose() if component.dispose isnt undefined
-
 		_.pull components, component
 
 		if components.length is 0

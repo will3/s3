@@ -1,4 +1,5 @@
 THREE = require 'three'
+Events = require('../core/brock.coffee').Events
 
 class RigidBody
 	constructor: () ->
@@ -6,6 +7,10 @@ class RigidBody
 		@velocity = new THREE.Vector3()
 		@acceleration = new THREE.Vector3()
 		@friction = 0.98
+		@events = new Events()
+		
+		# collision
+		@radius = 0
 
 	tick: () ->
 		@velocity.add @acceleration

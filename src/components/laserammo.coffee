@@ -1,26 +1,39 @@
 class LaserAmmo
-	constructor: () ->
-		@geometry = null
-		@material = null
+	@$inject: ['textures', 'app']
+
+	constructor: (@textures, @app) ->
 		@length = 1
 		@dir = new THREE.Vector3 0, 0, 1
-		@color = 0xff0000
-		@speed = 1
+		@color = 0xffffff
+		@speed = 3
 		@rigidBody = null
 		@objLaser = null
+		@laserMaterial = null
 
 	start: () ->
 		if @rigidBody is null
 			throw new Error 'rigidBody cannot be empty'
 
-		# init geometry
-		@geometry = new THREE.Geometry()
-		@geometry.vertices.push new THREE.Vector3()
-		@geometry.vertices.push @dir.clone().setLength -@length
-		@material = new THREE.LineBasicMaterial color: @color
-		@objLaser = new THREE.Line @geometry, @material
+		@objLaser = new THREE.Object3D()
 		@object.add @objLaser
 
+		lineSprite = @app.attach @objLaser, 'lineSprite'
+		texture = @textures.get 'laser'
+		material = new THREE.MeshBasicMaterial 
+			color: @color
+			side: THREE.DoubleSide
+			alphaMap: texture
+			transparent: true
+
+		lineSprite.material = material
+		@laserMaterial = material
+
+		lineSprite.dir = @dir
+		lineSprite.isDiamond = true
+
 		@rigidBody.velocity = @dir.clone().setLength @speed
+
+	dispose: () ->
+		@laserMaterial.dispose()
 
 module.exports = LaserAmmo
