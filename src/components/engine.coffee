@@ -11,7 +11,7 @@ class Engine
 		@particleGroup = null
 		@amount = 0
 		@size = 1.8
-		@thrust = 0.005
+		@thrust = 150
 
 	start: () ->
 		# create particle group

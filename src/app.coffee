@@ -140,20 +140,26 @@ initApp = () ->
 	# objEditor = app.addPrefab scene, 'editor'
 	# editor = app.getComponent objEditor, 'editor'
 
-	# objShip = app.addPrefab scene, 'ship'
+	# objShip = app.addPrefab scene, 'ship',
+	# 	control: 'player1',
+	# 	data: require './data/ship1.json'
+
 	# blockModel = app.getComponent objShip, 'blockModel'
 	# blockAttachments = app.getComponent objShip, 'blockAttachments'
 	# editor.blockModel = blockModel
 	# editor.blockAttachments = blockAttachments
 
-	# app.addPrefab scene, 'asteroid'
+	app.addPrefab scene, 'asteroid'
+
 	ship1 = app.addPrefab scene, 'ship',
+		control: 'player1'
 		data: require './data/ship0.json'
-	ship1.position.set 100, 0, 0
+	ship1.position.set 50, 0, 0
 
 	ship2 = app.addPrefab scene, 'ship', 
-		control: true
-		data: require './data/ship0.json'
+		control: 'player2'
+		data: require './data/ship1.json'
+	ship2.position.set -50, 0, 0
 
 	# app.addPrefab scene, 'laserAmmo'
 
@@ -162,7 +168,7 @@ initApp = () ->
 	# lineSprite = app.attach obj, 'lineSprite'
 	# lineSprite.texture = require('./textures.coffee').get 'laser'
 
-	app.attach camera, 'cameraController'
+	cameraController = app.attach camera, 'cameraController'
 
 	$('#container').focus()
 

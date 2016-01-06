@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "alea": "0.0.9",
+    "cannon": "^0.6.2",
     "grunt-contrib-copy": "^0.8.2",
     "jquery": "^2.1.4",
     "keycode": "^2.1.0",
@@ -26,7 +27,8 @@
   "browserify-shim": {
     "three": "global:THREE",
     "jquery": "global:$",
-    "lodash": "global:_"
+    "lodash": "global:_",
+    "cannon": "global:CANNON"
   },
   "browserify": {
     "transform": [

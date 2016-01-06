@@ -6,9 +6,9 @@ class CameraController
 		@lastY = 0
 		@rotateSpeed = 0.01
 		@target = new THREE.Vector3()
-		@rotation = new THREE.Euler Math.PI / 4, Math.PI / 4, 0
+		@rotation = new THREE.Euler Math.PI / 3, Math.PI / 4, 0
 		@rotation.order = 'YXZ'
-		@distance = 50
+		@distance = 100
 		@drag = false
 		@maxPitch = Math.PI / 2 - 0.01
 		@minPitch = -Math.PI / 2 + 0.01
@@ -27,8 +27,6 @@ class CameraController
 		@updateZoom()
 		@updateKeys()
 		@updateCamera()
-
-		return
 
 	updateMouse: () ->
 		inputState = @input.state

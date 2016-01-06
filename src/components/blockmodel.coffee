@@ -7,6 +7,8 @@ class BlockModel
 	
 	constructor: (@app) ->
 		@chunk = new Chunk()
+		@render = new Chunk()
+
 		@gridSize = 1
 		@origin = new THREE.Vector3()
 		@objModel = new THREE.Object3D()
@@ -19,17 +21,41 @@ class BlockModel
 		@objModel.position.copy offset
 
 	set: (x, y, z, obj) ->
+		if obj? and typeof obj is 'number'
+			obj = 
+				color: obj
+				integrity: 1.0
+				touchness: 2.0
+
 		@chunk.set x, y, z, obj
+		@update x, y, z
+
 		return
 
+	update: (x, y, z) ->
+		obj = @chunk.get x, y, z
+		if not obj? or obj.integrity <= 0
+			@render.set x, y, z, undefined
+			return
+
+		if obj.integrity is 1.0
+			@render.set x, y, z, obj.color
+		else
+			color = new THREE.Color obj.color
+			shade = 0.4 + 0.6 * obj.integrity
+			color.r *= shade
+			color.g *= shade
+			color.b *= shade
+			@render.set x, y, z, color.getHex()
+
 	setAtCoord: (coord, obj) ->
-		@chunk.set coord.x, coord.y, coord.z, obj
+		@set coord.x, coord.y, coord.z, obj
 
 	get: (x, y, z) ->
 		@chunk.get x, y, z
 
 	getAtCoord: (coord) ->
-		@chunk.get coord.x, coord.y, coord.z
+		@get coord.x, coord.y, coord.z
 
 	serialize: () ->
 		body = {}
@@ -50,7 +76,7 @@ class BlockModel
 
 		@chunk = new Chunk()
 		for v in body.chunk
-			@chunk.set v[0], v[1], v[2], v[3]
+			@set v[0], v[1], v[2], v[3]
 
 		return @
 

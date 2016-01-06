@@ -19,7 +19,7 @@ module.exports = (editor) ->
 		'leave dock': () ->
 			editor.toggleEdit()
 		'print': () ->
-			alert JSON.stringify editor.data()
+			console.log JSON.stringify editor.getData()
 
 	gui = new dat.GUI()
 

@@ -15,15 +15,13 @@ module.exports =
 
 		return intersect || null
 
-	coordAbove: (intersect, camera, options) ->
-		options = options || {}
-		gridSize = options.gridSize || 1
-		origin = options.origin || new THREE.Vector3 0, 0, 0
+	coordAbove: (point, from, blockModel) ->
+		gridSize = blockModel.gridSize
+		origin = blockModel.origin
 
-		point = intersect.point
-		diff = point.clone().sub camera.position
+		diff = point.clone().sub from.position
 		diff.setLength diff.length() - 0.01
-		pointAbove = camera.position.clone().add diff
+		pointAbove = from.position.clone().add diff
 
 		coord = pointAbove.clone().multiplyScalar(1 / gridSize)
 			.sub origin
@@ -36,15 +34,13 @@ module.exports =
 
 		coord
 
-	coordBelow: (intersect, camera, options) ->
-		options = options || {}
-		gridSize = options.gridSize || 1
-		origin = options.origin || new THREE.Vector3 0, 0, 0
+	coordBelow: (point, from, blockModel) ->
+		gridSize = blockModel.gridSize
+		origin = blockModel.origin
 
-		point = intersect.point
-		diff = point.clone().sub camera.position
+		diff = point.clone().sub from.position
 		diff.setLength diff.length() + 0.01
-		pointAbove = camera.position.clone().add diff
+		pointAbove = from.position.clone().add diff
 
 		coord = pointAbove.clone().multiplyScalar(1 / gridSize)
 			.sub origin
@@ -57,22 +53,20 @@ module.exports =
 
 		coord
 
-	coordToPoint: (coord, options) ->
-		options = options || {}
-		gridSize = options.gridSize || 1
-		origin = options.origin || new THREE.Vector3 0, 0, 0
+	coordToPoint: (coord, blockModel) ->
+		gridSize = blockModel.gridSize
+		origin = blockModel.origin
 
 		new THREE.Vector3 coord.x, coord.y, coord.z
 			.add origin
 			.multiplyScalar gridSize
 
-	pointToCoord: (point, options) ->
-		options = options || {}
-		gridSize = options.gridSize || 1
-		origin = options.origin || new THREE.Vector3 0, 0, 0
+	pointToCoord: (point, blockModel) ->
+		gridSize = blockModel.gridSize
+		origin = blockModel.origin
 
 		coord = point.clone().multiplyScalar(1 / gridSize)
-			.sub @origin
+			.sub origin
 
 		coord = new THREE.Vector3(
 			Math.round coord.x

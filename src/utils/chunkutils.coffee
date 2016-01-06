@@ -30,3 +30,25 @@ module.exports =
 		box = @boundingBox chunk
 		dis = new THREE.Vector3().subVectors box.max, box.min
 		return dis.length() / 2
+
+	count: (chunk) ->
+		count = 0
+		chunk.visit (x, y, z, value) ->
+			count++
+
+		return count
+
+	visitAround: (chunk, coord, radius, callback) ->
+		for x in [-radius..radius]
+			xDis = Math.abs x
+			for y in [-radius + xDis .. radius - xDis]
+				yDis = Math.abs y
+				for z in [-radius + xDis + yDis .. radius - xDis - yDis]
+					zDis = Math.abs z
+					dis = xDis + yDis + zDis
+
+					obj = chunk.get coord.x + x, coord.y + y, coord.z + z
+					stop = callback coord.x + x, coord.y + y, coord.z + z, obj, dis
+
+					if stop
+						return

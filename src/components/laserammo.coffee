@@ -5,7 +5,7 @@ class LaserAmmo
 		@length = 1
 		@dir = new THREE.Vector3 0, 0, 1
 		@color = 0xffffff
-		@speed = 3
+		@speed = 50
 		@rigidBody = null
 		@objLaser = null
 		@laserMaterial = null
@@ -30,8 +30,8 @@ class LaserAmmo
 
 		lineSprite.dir = @dir
 		lineSprite.isDiamond = true
-
-		@rigidBody.velocity = @dir.clone().setLength @speed
+		
+		@rigidBody.setVelocity @dir.clone().setLength @speed
 
 	dispose: () ->
 		@laserMaterial.dispose()

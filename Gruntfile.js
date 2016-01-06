@@ -20,7 +20,8 @@ module.exports = function(grunt) {
             'bower_components/tinycolor/dist/tinycolor-min.js',
             'bower_components/dat-gui/build/dat.gui.min.js',
             'bower_components/threex.rendererstats/threex.rendererstats.js',
-            'node_modules/shader-particle-engine/build/SPE.min.js'
+            'node_modules/shader-particle-engine/build/SPE.min.js',
+            'node_modules/cannon/build/cannon.js'
           ],
           dest: 'dist/js/vendor'
         }, {
@@ -93,5 +94,5 @@ module.exports = function(grunt) {
 
   grunt.registerTask('default', ['clean', 'mochaTest', 'copy', 'connect', 'watch']);
   grunt.registerTask('test', ['mochaTest', 'watch']);
-  
+
 };

@@ -46,7 +46,7 @@ class LineSprite
 	tick: () ->
 		quat1 = new THREE.Quaternion().setFromUnitVectors @right, @dir
 
-		look = new THREE.Vector3().subVectors @object.position, @camera.position
+		look = new THREE.Vector3().subVectors @object.getWorldPosition(), @camera.position
 		look.normalize()
 		offset = look.cross @dir
 		offset.setLength @width / 2

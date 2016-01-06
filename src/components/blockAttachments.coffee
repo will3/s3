@@ -13,8 +13,12 @@ class BlockAttachments
 		if @blockModel is null
 			throw new Error 'blockModel cannot be empty'
 
+	getAttachments: (coord) ->
+		return _.filter @attachments, (attachment) ->
+			attachment.coord.equals coord
+
 	addAttachment: (coord, type) ->
-		point = coordUtils.coordToPoint coord
+		point = coordUtils.coordToPoint coord, @blockModel
 
 		objAttachment = @app.addPrefab @blockModel.objModel, type
 		objAttachment.position.copy point
@@ -30,8 +34,7 @@ class BlockAttachments
 		@events.emit 'add', event
 
 	removeAttachments: (coord) ->
-		attachments = _.filter @attachments, (attachment) ->
-			attachment.coord.equals coord
+		attachments = @getAttachments coord
 		
 		for attachment in attachments
 			@app.destroy attachment.object

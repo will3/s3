@@ -15,7 +15,7 @@ class BlockMesher
 		return
 
 	tick: () ->
-		chunk = @blockModel.chunk
+		chunk = @blockModel.render
 		for id, chunk of chunk.chunks when chunk.dirty
 			@updateChunk chunk
 			chunk.dirty = false

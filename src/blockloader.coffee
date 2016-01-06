@@ -13,6 +13,7 @@ class BlockLoader
 			blockAttachmentsData = data.blockAttachments
 			blockAttachments.deserialize blockAttachmentsData if blockAttachmentsData?
 		catch ex
+			console.log ex
 			console.log 'failed to load model'
 
 		if center

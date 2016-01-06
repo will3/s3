@@ -7,7 +7,9 @@ class Laser
 		@fireInterval = 200
 		@gap = 2
 		@dir = new THREE.Vector3 0, 0, 1
-		@autofire = false
+		@autofire = false 
+		@damageExcludeMask = null
+		@ownerId = null
 
 	start: () ->
 		if @cooldown is null
@@ -25,13 +27,13 @@ class Laser
 				@cooldown.refresh 'fire'
 
 	_fire: () ->
-		objAmmo = @app.addPrefab @scene, 'laserAmmo'
-
 		forward = @dir.clone().applyEuler @object.getWorldRotation()
 
-		objAmmo.position.copy @object.getWorldPosition().add forward.clone().setLength @gap
+		objAmmo = @app.addPrefab @scene, 'laserAmmo',
+			excludeMask: @damageExcludeMask
+			ownerId: @ownerId
+			dir: forward
 
-		laserAmmo = @app.getComponent objAmmo, 'laserAmmo'
-		laserAmmo.dir = forward
+		objAmmo.position.copy @object.getWorldPosition().add forward.clone().setLength @gap
 
 module.exports = Laser

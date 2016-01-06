@@ -28,15 +28,14 @@ class Editor
 		if @blockAttachments is null
 			throw new Error 'blockAttachments cannot be empty'
 
-		try
-			editorData = JSON.parse window.localStorage.getItem 'editor'
-			if editorData isnt null
-				blockModelData = editorData.blockModel
-				@blockModel.deserialize blockModelData if blockModelData?
-				blockAttachmentsData = editorData.blockAttachments
-				@blockAttachments.deserialize blockAttachmentsData if blockAttachmentsData?
-		catch ex
-			console.log 'failed to parse localStorage'
+		# if @data?
+		# 	try
+		# 			blockModelData = @data.blockModel
+		# 			@blockModel.deserialize blockModelData if blockModelData?
+		# 			blockAttachmentsData = @data.blockAttachments
+		# 			@blockAttachments.deserialize blockAttachmentsData if blockAttachmentsData?
+		# 	catch ex
+		# 		console.log 'failed to parse localStorage'
 			
 		geometry = new THREE.PlaneGeometry(999, 999)
 		geometry.vertices.forEach (v) =>
@@ -56,13 +55,13 @@ class Editor
 		@blockPreview.arrow.visible = @component?
 		intersect = (@blockIntersect || @groundIntersect)
 		if intersect?
-			coord = coordUtils.coordAbove intersect, @camera
-			position = coordUtils.coordToPoint coord
+			coord = coordUtils.coordAbove intersect.point, @camera, @blockModel
+			position = coordUtils.coordToPoint coord, @blockModel
 			@blockPreview.object.position.copy position
 
 		if inputState.mouseClick @keyMap.mouseAdd
 			if intersect isnt null
-				coord = coordUtils.coordAbove intersect, @camera
+				coord = coordUtils.coordAbove intersect.point, @camera, @blockModel
 				@blockModel.setAtCoord coord, @color
 				if @component?
 					@blockAttachments.addAttachment coord, @component	
@@ -70,7 +69,7 @@ class Editor
 
 		if inputState.mouseClick @keyMap.mouseRemove
 			if intersect isnt null
-				coord = coordUtils.coordBelow intersect, @camera
+				coord = coordUtils.coordBelow intersect.point, @camera, @blockModel
 				@blockModel.setAtCoord coord, undefined
 				@blockAttachments.removeAttachments coord
 				@saveInLocalStorage()
@@ -100,7 +99,7 @@ class Editor
 
 		window.localStorage.setItem 'editor', JSON.stringify data
 			
-	data: () ->
+	getData: () ->
 		return JSON.parse window.localStorage.getItem 'editor'
 
 	clear: () ->
@@ -138,8 +137,8 @@ class Editor
 
 	toggleEdit: () ->
 		if @edit
-			endEdit()
+			@endEdit()
 		else
-			startEdit()
+			@startEdit()
 
 module.exports = Editor

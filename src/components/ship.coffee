@@ -1,5 +1,7 @@
 mathUtils = require '../utils/mathutils.coffee'
 chunkUtils = require '../utils/chunkutils.coffee'
+coordUtils = require '../utils/coordutils.coffee'
+damageUtils = require '../utils/damageutils.coffee'
 
 class Ship
 	@$inject: ['app']
@@ -7,6 +9,9 @@ class Ship
 	constructor: (@app) ->
 		@bankSpeed = 0.05
 		@thrust = 0
+		
+		@engineModifier = 1
+
 		@rigidBody = null
 		@blockModel = null
 		@turnSpeed = 0.05
@@ -14,12 +19,20 @@ class Ship
 		@bankAmount = 0
 		@maxTurn = Math.PI / 3
 		@blockAttachments = null
+		@damagable = null
 
 		@addListener = null
 		@removeListener = null
 
 		@engines = []
 		@turrents = []
+
+		@onCollision = null
+
+		@damageExcludeMask = []
+
+		@ownerId = null
+		@nextTurrentIndex = 0
 
 	start: () ->
 		if @rigidBody is null
@@ -28,6 +41,8 @@ class Ship
 			throw new Error 'blockAttachments cannot be empty'
 		if @blockModel is null
 			throw new Error 'blockModel cannot be empty'
+		if @damagable is null
+			throw new Error 'damagable cannot be empty'
 
 		@addListener = (event) =>
 			@updateAttachments()
@@ -39,12 +54,22 @@ class Ship
 
 		@updateAttachments()
 
-	updateRadius: () ->
-		@rigidBody.radius = chunkUtils.radius(@blockModel.chunk) * @blockModel.gridSize
+		@rigidBody.events.on 'collision', @onCollision = (b) =>
+			damage = @app.getComponent b.object, 'damage'
+			if damage?
+				if @damagable.by damage
+					point = b.object.position
+					localPoint = @object.worldToLocal point
+					coord = coordUtils.pointToCoord localPoint, @blockModel
+
+					if damageUtils.shouldApplyDamage @app, @object, coord, damage
+						damageUtils.applyDamage @app, @object, coord, damage
+						@app.destroy b.object
 
 	dispose: () ->
 		@blockAttachments.events.removeListener 'add', @addListener
 		@blockAttachments.events.removeListener 'remove', @removeListener
+		@rigidBody.events.removeListener 'rigidBody', @onCollision
 
 	# updates ship stats with components
 	updateAttachments: () ->
@@ -61,6 +86,8 @@ class Ship
 
 			if type is 'laser'
 				laser = @app.getComponent object, 'laser'
+				laser.damageExcludeMask = @damageExcludeMask
+				laser.ownerId = @ownerId
 				turrents.push laser
 				
 		@thrust = thrust
@@ -70,28 +97,36 @@ class Ship
 		return @
 
 	tick: () ->
-		turnRatio = (Math.sin @object.rotation.z)
-		@object.rotation.y -=  turnRatio * @turnSpeed * @accelerateAmount
-
 		# clamp bank and accelerate amount
 		@bankAmount = mathUtils.clamp @bankAmount, -1, 1
 		@accelerateAmount = mathUtils.clamp @accelerateAmount, 0, 1
 
-		# update turn
+		rotation = @object.rotation
+
+		# update roll
 		desiredZ = @bankAmount * @maxTurn;
-		zDiff = desiredZ - @object.rotation.z
+		zDiff = desiredZ - rotation.z
 		desiredZSpeed = zDiff * 0.1
-		@object.rotation.z += desiredZSpeed
+		rotation.z += desiredZSpeed
+		rotation.z = mathUtils.clamp rotation.z, -@maxTurn, @maxTurn
+
+		# update yaw
+		turnRatio = (Math.sin @object.rotation.z)
+		rotation.y -= turnRatio * @turnSpeed * @accelerateAmount
+
+		@rigidBody.setRotation rotation
 
 		# update thrust
-		force = new THREE.Vector3 0, 0, 1
-		force.applyEuler @object.rotation
-		force.multiplyScalar @thrust * @accelerateAmount
-		@rigidBody.applyForce force
+		forceMag = @thrust * @accelerateAmount * @engineModifier
+		if forceMag > 0
+			force = new THREE.Vector3 0, 0, 1
+			force.applyEuler @object.rotation
+			force.multiplyScalar forceMag
+			@rigidBody.applyForce force
 
 		# update engine visual
 		@engines.forEach (engine) =>
-			engine.amount = @accelerateAmount
+			engine.amount = @accelerateAmount * @engineModifier
 
 	bank: (amount) ->
 		@bankAmount += amount
@@ -104,9 +139,15 @@ class Ship
 		@bankAmount = 0
 
 	fireNext: () ->
-		for turrent in @turrents
-			if turrent.cooldown.ready 'fire'
-				turrent.fire()
-				return
+		return if @turrents.length is 0
+		turrent = @turrents[@nextTurrentIndex]
+		if not turrent?
+			turrent = @turrents[0]
+
+		if turrent.cooldown.ready 'fire'
+			turrent.fire()
+			@nextTurrentIndex++
+			if @nextTurrentIndex is @turrents.length
+				@nextTurrentIndex = 0
 
 module.exports = Ship

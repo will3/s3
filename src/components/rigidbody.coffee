@@ -1,26 +1,41 @@
 THREE = require 'three'
 Events = require('../core/brock.coffee').Events
+CANNON = require 'cannon'
 
 class RigidBody
-	constructor: () ->
-		@mass = 1
-		@velocity = new THREE.Vector3()
-		@acceleration = new THREE.Vector3()
-		@friction = 0.98
+	@$inject: ['physics']
+
+	constructor: (@physics) ->
+		@body = new CANNON.Body()
 		@events = new Events()
-		
-		# collision
-		@radius = 0
 
-	tick: () ->
-		@velocity.add @acceleration
-		@velocity.multiplyScalar @friction
-		@object.position.add @velocity
+	start: () ->
+		@copyPosition()
+		@physics.world.addBody @body
+		@physics.bodies[@body.id] = @
 
-		@acceleration.set 0, 0, 0
+	dispose: () ->
+		@physics.world.removeBody @body
+		delete @physics.bodies[@body.id]
 
 	applyForce: (force) ->
-		acc = force.clone().multiplyScalar 1 / @mass
-		@acceleration.add acc
+		worldPoint = @object.getWorldPosition()
+		@body.applyForce force, new CANNON.Vec3().copy worldPoint
+
+	setRotation: (rotation) ->
+		@body.quaternion.setFromEuler rotation.x, rotation.y, rotation.z, rotation.order
+
+	setVelocity: (velocity) ->
+		@body.velocity = new CANNON.Vec3().copy velocity
+
+	getVelocity: () ->
+		return new THREE.Vector3().copy @body.velocity
+
+	copyPosition: () ->
+		@body.position.copy @object.position
+
+	tick: () ->
+		@object.position.copy @body.position
+		@object.quaternion.copy @body.quaternion
 
 module.exports = RigidBody

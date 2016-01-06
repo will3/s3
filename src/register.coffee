@@ -26,13 +26,15 @@ module.exports = (app) ->
 	app.component 'selfDestruct', require './components/selfdestruct.coffee'
 	app.component 'cooldown', require './components/cooldown.coffee'
 	app.component 'lineSprite', require './components/linesprite.coffee'
-	
+	app.component 'damage', require './components/damage.coffee'
+	app.component 'damagable', require './components/damagable.coffee'
+
 	# systems
 	app.system 'particleGroups', require './systems/particlegroups.coffee'
-	app.system 'collision', require './systems/collision.coffee'
+	app.system 'physics', require './systems/physics.coffee'
 
 	app.use 'particleGroups'
-	app.use 'collision'
+	app.use 'physics'
 
 	# prefabs
 	app.prefab 'asteroid', require './prefabs/p_asteroid.coffee'

@@ -9,14 +9,25 @@
   "camera-right": "right",
   "camera-up": "up",
   "camera-down": "down",
-  "left": "a",
-  "right": "d",
-  "up": "w",
-  "down": "s",
   "toggleEdit": "enter",
   "rotateLeft": "a",
   "rotateRight": "d",
   "rotateUp": "w",
   "rotateDown": "s",
-  "fire": "j"
+
+  "left": "a",
+  "right": "d",
+  "up": "w",
+  "down": "s",
+  "fire": "f",
+  "boost": "g",
+
+  "left2": "j",
+  "right2": "l",
+  "up2": "i",
+  "down2": "k",
+  "fire2": ";",
+  "boost2": "'",
+
+  "restart": "enter"
 }
