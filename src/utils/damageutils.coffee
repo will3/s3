@@ -24,20 +24,3 @@ module.exports =
 		chunkUtils.visitAround blockModel.chunk, coord, radius, callback
 
 		return
-
-	shouldApplyDamage: (app, obj, coord, damage) ->
-		blockModel = app.getComponent obj, 'blockModel'
-
-		size = damage.size
-		radius = size - 1
-
-		found = false
-
-		callback = (x, y, z, obj, dis) ->
-			if obj? and obj.integrity > 0
-				found = true
-				return true
-
-		chunkUtils.visitAround blockModel.chunk, coord, radius, callback
-
-		return found

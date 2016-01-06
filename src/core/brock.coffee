@@ -12,7 +12,6 @@ class Brock
 		
 		Events = require './events.coffee'
 		@events = new Events()
-
 		@start()
 
 	getComponents: (object) ->
@@ -116,7 +115,6 @@ class Brock
 
 		for type, system of @systems
 			system.lateTick() if system.lateTick isnt undefined
-		return
 
 	start: () ->
 		interval = () =>

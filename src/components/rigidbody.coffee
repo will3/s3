@@ -8,6 +8,7 @@ class RigidBody
 	constructor: (@physics) ->
 		@body = new CANNON.Body()
 		@events = new Events()
+		@radius = 0
 
 	start: () ->
 		@copyPosition()

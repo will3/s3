@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "watchify -t coffeeify ./src/app.coffee -o ./src/bundle.js -v --debug",
+    "build": "watchify -t coffeeify ./src/app.coffee -o ./build/js/bundle.js -v --debug",
     "test": "grunt mochaTest"
   },
   "author": "",
@@ -20,6 +20,7 @@
     "noisejs": "^2.1.0",
     "shader-particle-engine": "^1.0.2",
     "simplex-noise": "^2.2.0",
+    "stats.js": "^1.0.0",
     "three": "^0.73.0",
     "tic": "^1.0.0",
     "voxelize": "^1.0.0"

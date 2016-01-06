@@ -21,13 +21,14 @@ module.exports = function(grunt) {
             'bower_components/dat-gui/build/dat.gui.min.js',
             'bower_components/threex.rendererstats/threex.rendererstats.js',
             'node_modules/shader-particle-engine/build/SPE.min.js',
-            'node_modules/cannon/build/cannon.js'
+            'node_modules/cannon/build/cannon.js',
+            'node_modules/cannon/build/cannon.min.js'
           ],
           dest: 'dist/js/vendor'
         }, {
           expand: true,
           flatten: true,
-          src: ['src/bundle.js'],
+          src: ['build/js/*.js'],
           dest: 'dist/js/'
         }, {
           expand: true,
@@ -61,7 +62,7 @@ module.exports = function(grunt) {
 
     watch: {
       main: {
-        files: ['src/index.html', 'src/bundle.js', 'src/images/*', 'src/gui/*.css', 'Gruntfile.js'],
+        files: ['src/index.html', 'build/js/bundle.js', 'src/images/*', 'src/gui/*.css', 'Gruntfile.js'],
         tasks: ['copy', 'mochaTest'],
         options: {
           livereload: true

@@ -29,6 +29,7 @@ module.exports = (app, options = {}) ->
 	rigidBody.mass = 1
 	rigidBody.body.type = CANNON.Body.DYNAMIC
 	rigidBody.body.addShape new CANNON.Sphere radius
+	rigidBody.radius = radius
 	rigidBody.body.linearDamping = 0.15
 	rigidBody.body.collisionResponse = false
 	rigidBody.body.collisionFilterGroup = CollisionGroups.Ammo

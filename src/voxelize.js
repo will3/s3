@@ -1,0 +1,1 @@
+window.voxelize = require('voxelize');

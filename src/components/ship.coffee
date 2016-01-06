@@ -2,6 +2,7 @@ mathUtils = require '../utils/mathutils.coffee'
 chunkUtils = require '../utils/chunkutils.coffee'
 coordUtils = require '../utils/coordutils.coffee'
 damageUtils = require '../utils/damageutils.coffee'
+hitTests = require '../utils/hittests.coffee'
 
 class Ship
 	@$inject: ['app']
@@ -58,11 +59,11 @@ class Ship
 			damage = @app.getComponent b.object, 'damage'
 			if damage?
 				if @damagable.by damage
-					point = b.object.position
+					point = b.object.position.clone()
 					localPoint = @object.worldToLocal point
 					coord = coordUtils.pointToCoord localPoint, @blockModel
 
-					if damageUtils.shouldApplyDamage @app, @object, coord, damage
+					if hitTests.blockAndSphere @blockModel, coord, b.radius
 						damageUtils.applyDamage @app, @object, coord, damage
 						@app.destroy b.object
 
