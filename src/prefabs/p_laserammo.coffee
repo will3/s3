@@ -23,16 +23,19 @@ module.exports = (app, options = {}) ->
 
 	laserAmmo.rigidBody = rigidBody
 	laserAmmo.dir = dir
+	laserAmmo.damage = damage
 
 	# configure rigid body
 	radius = 1
 	rigidBody.mass = 1
+	rigidBody.radius = radius
+	rigidBody.group = CollisionGroups.Ammo
+
 	rigidBody.body.type = CANNON.Body.DYNAMIC
 	rigidBody.body.addShape new CANNON.Sphere radius
-	rigidBody.radius = radius
 	rigidBody.body.linearDamping = 0.15
 	rigidBody.body.collisionResponse = false
 	rigidBody.body.collisionFilterGroup = CollisionGroups.Ammo
-	rigidBody.body.collisionFilterMask = CollisionGroups.Ship
+	rigidBody.body.collisionFilterMask = CollisionGroups.Ship | CollisionGroups.Structure
 
 	return object

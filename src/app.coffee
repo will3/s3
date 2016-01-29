@@ -26,7 +26,6 @@ initApp = () ->
 	container = $('#container')[0]
 	input = brock.input container
 	app.use 'input', input
-	
 
 	require('./register.coffee')(app)
 
@@ -45,16 +44,16 @@ initApp = () ->
 	# editor.blockModel = blockModel
 	# editor.blockAttachments = blockAttachments
 
-	app.addPrefab scene, 'asteroid'
+	# app.addPrefab scene, 'asteroid'
 
-	ship1 = app.addPrefab scene, 'ship',
-		control: 'player1'
-		data: require './data/ship0.json'
-	ship1.position.set -50, 0, 0
+	# ship1 = app.addPrefab scene, 'ship',
+	# 	control: 'player1'
+	# 	data: require './data/ship0.json'
+	# ship1.position.set -50, 0, 0
 
-	ship2 = app.addPrefab scene, 'ship', 
-		data: require './data/ship1.json'
-	ship2.position.set 50, 0, 0
+	# ship2 = app.addPrefab scene, 'ship', 
+	# 	data: require './data/ship1.json'
+	# ship2.position.set 50, 0, 0
 
 	# app.addPrefab scene, 'laserAmmo'
 
@@ -67,27 +66,27 @@ initApp = () ->
 
 	$('#container').focus()
 
-	cpr
-		palette: [
-			'rgb(249, 246, 51)', 
-			'rgb(110, 236, 167)', 
-			'rgb(39, 151, 251)',
-			'rgb(237, 72, 81)',
-			'rgb(242, 137, 66)',
-			'#f6f6f6'
-		],
-		click: (color) ->
-			rgbString = color.toRgbString()
-			threeColor = new THREE.Color rgbString
-			hex = threeColor.getHex()
-			editor.color = hex
-		focus: () ->
-			#got focus 
-		blur: () ->
-			#lost focus 
+	# cpr
+	# 	palette: [
+	# 		'rgb(249, 246, 51)', 
+	# 		'rgb(110, 236, 167)', 
+	# 		'rgb(39, 151, 251)',
+	# 		'rgb(237, 72, 81)',
+	# 		'rgb(242, 137, 66)',
+	# 		'#f6f6f6'
+	# 	],
+	# 	click: (color) ->
+	# 		rgbString = color.toRgbString()
+	# 		threeColor = new THREE.Color rgbString
+	# 		hex = threeColor.getHex()
+	# 		editor.color = hex
+	# 	focus: () ->
+	# 		#got focus 
+	# 	blur: () ->
+	# 		#lost focus 
 
-	addMenu = require './addmenu.coffee'
-	addMenu editor
+	# addMenu = require './addmenu.coffee'
+	# addMenu editor
 
 	return
 

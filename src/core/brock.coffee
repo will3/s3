@@ -87,7 +87,7 @@ class Brock
 		if system.initialized?
 			system.initialized()
 
-		return
+		return system
 
 	get: (type) ->
 		return @_injector.get type

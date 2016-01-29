@@ -9,10 +9,18 @@ class LaserAmmo
 		@rigidBody = null
 		@objLaser = null
 		@laserMaterial = null
+		@damage = null
 
 	start: () ->
 		if @rigidBody is null
 			throw new Error 'rigidBody cannot be empty'
+		if @damage is null
+			throw new Error 'damage cannot be empty'
+
+		@rigidBody.events.on 'collision', @onCollision = (b) =>
+			damagable = @app.getComponent b.object, 'damagable'
+			if damagable? and damagable.by @damage
+				@app.destroy @object
 
 		@objLaser = new THREE.Object3D()
 		@object.add @objLaser
@@ -35,5 +43,6 @@ class LaserAmmo
 
 	dispose: () ->
 		@laserMaterial.dispose()
+		@rigidBody.events.removeListener 'collision', @onCollision
 
 module.exports = LaserAmmo

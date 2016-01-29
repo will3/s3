@@ -1,10 +1,11 @@
+Cooldown = require '../cooldown.coffee'
 class Laser
 	@$inject: ['app', 'scene']
 
 	constructor: (@app, @scene) ->
 		@color = 0xff0000
-		@cooldown = null
-		@fireInterval = 200
+		@cooldown = new Cooldown()
+		@fireInterval = 500
 		@gap = 2
 		@dir = new THREE.Vector3 0, 0, 1
 		@autofire = false 
@@ -12,12 +13,11 @@ class Laser
 		@ownerId = null
 
 	start: () ->
-		if @cooldown is null
-			throw new Error 'cooldown cannot be empty'
-
 		@cooldown.add 'fire', @fireInterval
 
 	tick: () ->
+		@cooldown.tick()
+
 		if @autofire
 			@fire()
 

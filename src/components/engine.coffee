@@ -10,7 +10,7 @@ class Engine
 		@emitter = null
 		@particleGroup = null
 		@amount = 0
-		@size = 1.8
+		@size = 2.4
 		@thrust = 150
 
 	start: () ->

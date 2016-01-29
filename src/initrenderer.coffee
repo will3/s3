@@ -46,7 +46,7 @@ module.exports = (app, scene, camera) ->
 			
 		stats = new Stats()
 		stats.domElement.style.position = 'absolute'
-		stats.domElement.style.left = '100px'
+		stats.domElement.style.left = '110px'
 		stats.domElement.style.top = '20px'
 		document.body.appendChild stats.domElement
 

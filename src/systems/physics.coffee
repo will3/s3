@@ -16,10 +16,13 @@ class Physics
 		@world.step @fixedTimeStep, dt, @maxSubSteps
 
 		for contact in @world.contacts
-			rigidBodyi = @bodies[contact.bi.id]
-			rigidBodyj = @bodies[contact.bj.id]
-			if rigidBodyi? and rigidBodyj?
-				rigidBodyi.events.emit 'collision', rigidBodyj
-				rigidBodyj.events.emit 'collision', rigidBodyi
+			a = @bodies[contact.bi.id]
+			b = @bodies[contact.bj.id]
+			if a? and b?
+				@onContact a, b
+
+	onContact: (a, b) ->
+		a.events.emit 'collision', b
+		b.events.emit 'collision', a	
 
 module.exports = Physics

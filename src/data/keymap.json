@@ -20,14 +20,12 @@
   "up": "w",
   "down": "s",
   "fire": "j",
-  "boost": "k",
 
   "left2": "j",
   "right2": "l",
   "up2": "i",
   "down2": "k",
   "fire2": ";",
-  "boost2": "'",
 
   "restart": "enter"
 }

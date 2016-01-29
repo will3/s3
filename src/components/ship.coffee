@@ -3,6 +3,7 @@ chunkUtils = require '../utils/chunkutils.coffee'
 coordUtils = require '../utils/coordutils.coffee'
 damageUtils = require '../utils/damageutils.coffee'
 hitTests = require '../utils/hittests.coffee'
+CollisionGroups = require '../collisiongroups.coffee'
 
 class Ship
 	@$inject: ['app']
@@ -55,17 +56,13 @@ class Ship
 
 		@updateAttachments()
 
-		@rigidBody.events.on 'collision', @onCollision = (b) =>
-			damage = @app.getComponent b.object, 'damage'
-			if damage?
-				if @damagable.by damage
-					point = b.object.position.clone()
-					localPoint = @object.worldToLocal point
-					coord = coordUtils.pointToCoord localPoint, @blockModel
-
-					if hitTests.blockAndSphere @blockModel, coord, b.radius
+		@rigidBody.events.on 'collision', @onCollision = (b, collision) =>
+			if b.group is CollisionGroups.Ammo
+				coord = collision.coord
+				damage = @app.getComponent b.object, 'damage'
+				if damage?
+					if @damagable.by damage
 						damageUtils.applyDamage @app, @object, coord, damage
-						@app.destroy b.object
 
 	dispose: () ->
 		@blockAttachments.events.removeListener 'add', @addListener

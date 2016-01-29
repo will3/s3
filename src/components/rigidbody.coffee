@@ -9,6 +9,7 @@ class RigidBody
 		@body = new CANNON.Body()
 		@events = new Events()
 		@radius = 0
+		@group = null
 
 	start: () ->
 		@copyPosition()

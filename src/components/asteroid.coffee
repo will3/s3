@@ -3,17 +3,10 @@ genAsteroid = require '../voxel/procedural/asteroid.coffee'
 class Asteroid
 	constructor: (@app) ->
 		@blockModel = null
-		@rigidBody = null
-		@onCollision = null
 
 	start: () ->
 		if @blockModel is null
 			throw new Error 'blockModel cannot be empty'
-		if @rigidBody is null
-			throw new Error 'rigidBody cannot be empty'
-
-		@rigidBody.events.on 'collision', @onCollision = (b) =>
-			# todo
 
 		result = genAsteroid();
 
@@ -32,8 +25,5 @@ class Asteroid
 
 	tick: () ->
 		return
-
-	dispose: () ->
-		@rigidBody.removeListener 'collision', @onCollision
 
 module.exports = Asteroid

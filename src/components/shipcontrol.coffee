@@ -3,20 +3,19 @@ Keyboard = {
 	Player2: 1
 }
 
+Cooldown = require '../cooldown.coffee'
+
 class ShipControl
 	@$inject: ['input', 'keyMap', 'app']
 
 	constructor: (@input, @keyMap, @app) ->
 		@ship = null
-		@turnAccelerateAmount = 0.5
-		@cooldown = null
+		@turnAccelerateAmount = 1.0
+		@cooldown = new Cooldown()
 		@sequentialFireInterval = 100
 		@keyboard = Keyboard.Player1
 
 	start: () ->
-		if @cooldown is null
-			throw new Error 'cooldown cannot be empty'
-
 		@cooldown.add 'sequential fire', @sequentialFireInterval
 		@updateKeyboard()
 
@@ -27,18 +26,18 @@ class ShipControl
 			@key_left = @keyMap.left
 			@key_right = @keyMap.right
 			@key_fire = @keyMap.fire
-			@key_boost = @keyMap.boost
 		else
 			@key_up = @keyMap.up2
 			@key_down = @keyMap.down2
 			@key_left = @keyMap.left2
 			@key_right = @keyMap.right2
 			@key_fire = @keyMap.fire2
-			@key_boost = @keyMap.boost2
 
 	tick: () ->
 		if @ship == null
 			return
+
+		@cooldown.tick()
 
 		inputState = @input.state
 
@@ -54,14 +53,6 @@ class ShipControl
 		if inputState.keyHold @key_right
 			rightAmount++
 
-		boosted = false
-		if inputState.keyHold @key_boost
-			upAmount = 1
-			boosted = true
-			@ship.engineModifier = 2
-		else
-			@ship.engineModifier = 1
-
 		@ship.bank rightAmount
 
 		if rightAmount isnt 0 and upAmount is 0
@@ -69,12 +60,10 @@ class ShipControl
 
 		@ship.accelerate upAmount
 
-		canFire = !boosted
-		if canFire
-			if @cooldown.ready 'sequential fire'
-				if inputState.keyHold @key_fire
-					@ship.fireNext()
-					@cooldown.refresh 'sequential fire'
+		if @cooldown.ready 'sequential fire'
+			if inputState.keyHold @key_fire
+				@ship.fireNext()
+				@cooldown.refresh 'sequential fire'
 
 ShipControl.Keyboard = Keyboard
 module.exports = ShipControl

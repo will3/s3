@@ -15,15 +15,18 @@ module.exports = (app) ->
 	radius *= blockModel.gridSize
 
 	rigidBody = app.attach object, 'rigidBody'
+	rigidBody.group = CollisionGroups.Structure
+	rigidBody.radius = radius
+
 	rigidBody.body.mass = 0
 	rigidBody.body.type = CANNON.Body.Dynamic
 	rigidBody.body.addShape new CANNON.Sphere radius
-	rigidBody.radius = radius
 	rigidBody.body.collisionResponse = false
-	rigidBody.body.collisionFilterGroup = CollisionGroups.Ship
+	rigidBody.body.collisionFilterGroup = CollisionGroups.Structure
 	rigidBody.body.collisionFilterMask = CollisionGroups.Ammo | CollisionGroups.Ship
 
 	asteroid.blockModel = blockModel
-	asteroid.rigidBody = rigidBody
+
+	damagable = app.attach object, 'damagable'
 
 	return object
